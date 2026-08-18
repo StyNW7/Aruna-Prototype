@@ -1,16 +1,17 @@
-import SiteHeader from "@/components/Navbar";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
+import { PublicNavbar } from "@/components/layout/PublicNavbar";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 function RootLayout() {
-    return (
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <SiteHeader />
-            <div className="relative flex min-h-svh flex-col bg-background">
-                <Outlet />
-            </div>
-        </ThemeProvider>
-    );
+  return (
+    <div className="relative flex min-h-svh flex-col bg-aruna-bg">
+      <PublicNavbar />
+      <div className="flex-1">
+        <Outlet />
+      </div>
+      <PublicFooter />
+    </div>
+  );
 }
 
 export default RootLayout;
