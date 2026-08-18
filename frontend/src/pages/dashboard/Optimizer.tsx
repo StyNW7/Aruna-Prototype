@@ -230,6 +230,7 @@ export default function Optimizer() {
       <PageHeader
         title="Optimal Production Mix"
         subtitle="Temukan kombinasi finished goods terbaik berdasarkan supply, yield, profitability, energy, demand, capacity, dan quality."
+        breadcrumbs={[{ label: "FISH Operations", href: "/app/overview" }, { label: "Production Optimizer" }]}
         badge={
           <Badge variant="outline" className="gap-1">
             <Info className="h-3 w-3" /> Prototype Optimization Simulation

@@ -148,6 +148,7 @@ export default function Scenario() {
       <PageHeader
         title="Scenario & Sensitivity Simulator"
         subtitle="Uji ketahanan production mix optimal terhadap guncangan supply, energi, yield, dan kapasitas."
+        breadcrumbs={[{ label: "FISH Operations", href: "/app/overview" }, { label: "Scenario Simulator" }]}
         badge={
           <Badge variant="outline" className="gap-1">
             <Info className="h-3 w-3" /> Prototype Optimization Simulation

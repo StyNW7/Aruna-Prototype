@@ -130,6 +130,7 @@ export default function Value() {
       <PageHeader
         title="Integrated Value Optimization"
         subtitle="Lihat nilai produk secara menyeluruh — bukan sekadar harga jual, tapi yield, biaya, dan energi yang membentuk true margin."
+        breadcrumbs={[{ label: "FISH Operations", href: "/app/overview" }, { label: "Value Optimization" }]}
       />
 
       <Tabs defaultValue="yield">

@@ -1,11 +1,11 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, MapPin } from "lucide-react";
 import { navGroups } from "./nav-config";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationDrawer } from "./NotificationDrawer";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { ProfileMenu } from "./ProfileMenu";
 import { useAppContext } from "@/context/AppContext";
-import { currentUser } from "@/data/roles";
 
 const allItems = navGroups.flatMap((g) => g.items);
 
@@ -25,7 +25,9 @@ export function DashboardHeader() {
         </button>
         <div className="min-w-0">
           <nav className="hidden items-center gap-1 text-xs text-aruna-textSecondary sm:flex">
-            <span>FISH Operations</span>
+            <Link to="/app/overview" className="transition-colors hover:text-aruna-primary">
+              FISH Operations
+            </Link>
             <span>/</span>
             <span className="text-aruna-text">{current?.label ?? "Dashboard"}</span>
           </nav>
@@ -43,9 +45,7 @@ export function DashboardHeader() {
         <GlobalSearch />
         <NotificationDrawer />
         <RoleSwitcher />
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-aruna-primary text-xs font-semibold text-white">
-          {currentUser.avatarInitials}
-        </div>
+        <ProfileMenu />
       </div>
     </header>
   );

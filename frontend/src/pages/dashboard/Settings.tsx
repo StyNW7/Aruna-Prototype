@@ -1,3 +1,5 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { PageHeader } from "@/components/cards/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,7 +13,26 @@ import { roleDefinitions } from "@/data/roles";
 import { ENERGY_TARIFF_RUPIAH_PER_KWH } from "@/data/energy";
 import { CONTAINER_CAPACITY_KG } from "@/data/shipment";
 
+const CAPACITY_DEFAULTS = { processingKg: 20000, freezingKg: 12000, coldStorageKg: 45000, shipmentKg: CONTAINER_CAPACITY_KG };
+const ENERGY_DEFAULTS = { tariff: ENERGY_TARIFF_RUPIAH_PER_KWH, bandsawKw: 11.5, chillingKw: 9.6, freezingKw: 18.4 };
+const PRICING_DEFAULTS = { targetMarginPct: 22, pricingFloorPct: 8, negotiationTolerancePct: 5 };
+const QUALITY_DEFAULTS = { minSizeGrade: "14 UP", minQualityGrade: "Grade C", agingLimitDays: 7, exportFreshness: "Baik" };
+
 export default function Settings() {
+  const [capacity, setCapacity] = useState(CAPACITY_DEFAULTS);
+  const [energy, setEnergy] = useState(ENERGY_DEFAULTS);
+  const [pricing, setPricing] = useState(PRICING_DEFAULTS);
+  const [quality, setQuality] = useState(QUALITY_DEFAULTS);
+
+  function saveSection(label: string) {
+    toast.success(`Pengaturan ${label} berhasil disimpan.`);
+  }
+
+  function resetSection<T>(label: string, defaults: T, setter: (v: T) => void) {
+    setter(defaults);
+    toast(`Pengaturan ${label} dikembalikan ke nilai default.`);
+  }
+
   return (
     <div>
       <PageHeader
@@ -67,24 +88,42 @@ export default function Settings() {
             <CardContent className="grid grid-cols-1 gap-4 pt-0 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Kapasitas Processing (kg/hari)</Label>
-                <Input type="number" defaultValue={20000} />
+                <Input
+                  type="number"
+                  value={capacity.processingKg}
+                  onChange={(e) => setCapacity({ ...capacity, processingKg: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Kapasitas Freezing (kg/hari)</Label>
-                <Input type="number" defaultValue={12000} />
+                <Input
+                  type="number"
+                  value={capacity.freezingKg}
+                  onChange={(e) => setCapacity({ ...capacity, freezingKg: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Kapasitas Cold Storage (kg)</Label>
-                <Input type="number" defaultValue={45000} />
+                <Input
+                  type="number"
+                  value={capacity.coldStorageKg}
+                  onChange={(e) => setCapacity({ ...capacity, coldStorageKg: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Kapasitas Shipment per Container (kg)</Label>
-                <Input type="number" defaultValue={CONTAINER_CAPACITY_KG} />
+                <Input
+                  type="number"
+                  value={capacity.shipmentKg}
+                  onChange={(e) => setCapacity({ ...capacity, shipmentKg: Number(e.target.value) })}
+                />
               </div>
             </CardContent>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <Button variant="outline">Reset</Button>
-              <Button>Simpan Perubahan</Button>
+              <Button variant="outline" onClick={() => resetSection("Plant Capacity", CAPACITY_DEFAULTS, setCapacity)}>
+                Reset
+              </Button>
+              <Button onClick={() => saveSection("Plant Capacity")}>Simpan Perubahan</Button>
             </div>
           </Card>
         </TabsContent>
@@ -98,24 +137,46 @@ export default function Settings() {
             <CardContent className="grid grid-cols-1 gap-4 pt-0 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Tarif Listrik (Rp/kWh)</Label>
-                <Input type="number" step="0.1" defaultValue={ENERGY_TARIFF_RUPIAH_PER_KWH} />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={energy.tariff}
+                  onChange={(e) => setEnergy({ ...energy, tariff: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Daya Bandsaw Cutting (kW)</Label>
-                <Input type="number" step="0.1" defaultValue={11.5} />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={energy.bandsawKw}
+                  onChange={(e) => setEnergy({ ...energy, bandsawKw: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Daya Chilling (kW)</Label>
-                <Input type="number" step="0.1" defaultValue={9.6} />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={energy.chillingKw}
+                  onChange={(e) => setEnergy({ ...energy, chillingKw: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Daya Freezing (kW)</Label>
-                <Input type="number" step="0.1" defaultValue={18.4} />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={energy.freezingKw}
+                  onChange={(e) => setEnergy({ ...energy, freezingKw: Number(e.target.value) })}
+                />
               </div>
             </CardContent>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <Button variant="outline">Reset</Button>
-              <Button>Simpan Perubahan</Button>
+              <Button variant="outline" onClick={() => resetSection("Energy", ENERGY_DEFAULTS, setEnergy)}>
+                Reset
+              </Button>
+              <Button onClick={() => saveSection("Energy")}>Simpan Perubahan</Button>
             </div>
           </Card>
         </TabsContent>
@@ -170,11 +231,19 @@ export default function Settings() {
             <CardContent className="grid grid-cols-1 gap-4 pt-0 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Target Margin (%)</Label>
-                <Input type="number" defaultValue={22} />
+                <Input
+                  type="number"
+                  value={pricing.targetMarginPct}
+                  onChange={(e) => setPricing({ ...pricing, targetMarginPct: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Pricing Floor (% di atas HPP)</Label>
-                <Input type="number" defaultValue={8} />
+                <Input
+                  type="number"
+                  value={pricing.pricingFloorPct}
+                  onChange={(e) => setPricing({ ...pricing, pricingFloorPct: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Kurs USD/IDR Acuan</Label>
@@ -182,12 +251,18 @@ export default function Settings() {
               </div>
               <div className="space-y-1.5">
                 <Label>Toleransi Negosiasi (%)</Label>
-                <Input type="number" defaultValue={5} />
+                <Input
+                  type="number"
+                  value={pricing.negotiationTolerancePct}
+                  onChange={(e) => setPricing({ ...pricing, negotiationTolerancePct: Number(e.target.value) })}
+                />
               </div>
             </CardContent>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <Button variant="outline">Reset</Button>
-              <Button>Simpan Perubahan</Button>
+              <Button variant="outline" onClick={() => resetSection("Pricing", PRICING_DEFAULTS, setPricing)}>
+                Reset
+              </Button>
+              <Button onClick={() => saveSection("Pricing")}>Simpan Perubahan</Button>
             </div>
           </Card>
         </TabsContent>
@@ -201,7 +276,10 @@ export default function Settings() {
             <CardContent className="grid grid-cols-1 gap-4 pt-0 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Minimum Size Grade Default</Label>
-                <Select defaultValue="14 UP">
+                <Select
+                  value={quality.minSizeGrade}
+                  onChange={(e) => setQuality({ ...quality, minSizeGrade: e.target.value })}
+                >
                   <option>14 UP</option>
                   <option>20 UP</option>
                   <option>30 UP</option>
@@ -209,18 +287,28 @@ export default function Settings() {
               </div>
               <div className="space-y-1.5">
                 <Label>Minimum Quality Grade Default</Label>
-                <Select defaultValue="Grade C">
+                <Select
+                  value={quality.minQualityGrade}
+                  onChange={(e) => setQuality({ ...quality, minQualityGrade: e.target.value })}
+                >
                   <option>Grade C</option>
                   <option>Grade B</option>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>Batas Umur Aging (hari)</Label>
-                <Input type="number" defaultValue={7} />
+                <Input
+                  type="number"
+                  value={quality.agingLimitDays}
+                  onChange={(e) => setQuality({ ...quality, agingLimitDays: Number(e.target.value) })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Freshness Minimum untuk Ekspor</Label>
-                <Select defaultValue="Baik">
+                <Select
+                  value={quality.exportFreshness}
+                  onChange={(e) => setQuality({ ...quality, exportFreshness: e.target.value })}
+                >
                   <option>Perlu Perhatian</option>
                   <option>Baik</option>
                   <option>Prima</option>
@@ -228,8 +316,10 @@ export default function Settings() {
               </div>
             </CardContent>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <Button variant="outline">Reset</Button>
-              <Button>Simpan Perubahan</Button>
+              <Button variant="outline" onClick={() => resetSection("Quality", QUALITY_DEFAULTS, setQuality)}>
+                Reset
+              </Button>
+              <Button onClick={() => saveSection("Quality")}>Simpan Perubahan</Button>
             </div>
           </Card>
         </TabsContent>

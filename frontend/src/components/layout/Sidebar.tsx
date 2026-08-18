@@ -1,23 +1,41 @@
-import { NavLink } from "react-router-dom";
-import { Waves, PanelLeftClose, PanelLeftOpen, LogOut, X } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Waves, PanelLeftClose, PanelLeftOpen, LogOut, X, Home } from "lucide-react";
 import { navGroups } from "./nav-config";
 import { useAppContext } from "@/context/AppContext";
 import { currentUser } from "@/data/roles";
 import { cn } from "@/lib/utils";
 
 function SidebarInner({ collapsed }: { collapsed: boolean }) {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    toast.success("Anda telah keluar dari FISH Operations.");
+    navigate("/masuk");
+  }
+
   return (
     <>
-      <div className={cn("flex items-center gap-2.5 px-4 py-5", collapsed && "justify-center px-2")}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg aruna-gradient text-white shadow-sm">
-          <Waves className="h-5 w-5" />
-        </div>
-        {!collapsed && (
-          <div className="min-w-0">
-            <p className="font-display text-sm font-bold leading-tight text-white">FISH Operations</p>
-            <p className="truncate text-xs text-white/60">Hub Bungus</p>
+      <div className={cn("px-3 py-5", collapsed && "px-2")}>
+        <Link
+          to="/"
+          title="Kembali ke Situs Utama Aruna FISH"
+          className={cn(
+            "group flex items-center gap-2.5 rounded-lg px-1 py-1 transition-colors hover:bg-white/5",
+            collapsed && "justify-center"
+          )}
+        >
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg aruna-gradient text-white shadow-sm">
+            <Waves className="h-5 w-5 transition-opacity group-hover:opacity-0" />
+            <Home className="absolute h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
-        )}
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="font-display text-sm font-bold leading-tight text-white">FISH Operations</p>
+              <p className="truncate text-xs text-white/60">Hub Bungus</p>
+            </div>
+          )}
+        </Link>
       </div>
 
       <nav className="flex-1 space-y-5 overflow-y-auto px-2.5 pb-4">
@@ -54,7 +72,7 @@ function SidebarInner({ collapsed }: { collapsed: boolean }) {
         ))}
       </nav>
 
-      <div className={cn("border-t border-white/10 p-3", collapsed && "flex flex-col items-center")}>
+      <div className={cn("border-t border-white/10 p-3", collapsed && "flex flex-col items-center gap-2")}>
         <div className={cn("flex items-center gap-2.5 rounded-lg px-2 py-2", !collapsed && "hover:bg-white/5")}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold text-white">
             {currentUser.avatarInitials}
@@ -66,11 +84,26 @@ function SidebarInner({ collapsed }: { collapsed: boolean }) {
             </div>
           )}
           {!collapsed && (
-            <button className="text-white/50 hover:text-white" title="Keluar">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+              title="Keluar"
+            >
               <LogOut className="h-4 w-4" />
             </button>
           )}
         </div>
+        {collapsed && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+            title="Keluar"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </>
   );

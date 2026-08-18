@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Clock,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -88,7 +89,18 @@ export default function Insight() {
       <section className="container py-16">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((a) => (
-            <Card key={a.title} className="flex flex-col transition-shadow hover:shadow-soft">
+            <Card
+              key={a.title}
+              role="button"
+              tabIndex={0}
+              onClick={() => toast("Detail artikel akan tersedia pada versi produksi.")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  toast("Detail artikel akan tersedia pada versi produksi.");
+                }
+              }}
+              className="flex cursor-pointer flex-col transition-shadow hover:shadow-soft"
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">

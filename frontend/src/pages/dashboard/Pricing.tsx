@@ -81,6 +81,7 @@ export default function Pricing() {
       <PageHeader
         title="Pricing Advisor"
         subtitle="Evaluasi tawaran harga buyer terhadap pricing floor dan target margin secara real-time."
+        breadcrumbs={[{ label: "FISH Operations", href: "/app/overview" }, { label: "Pricing Advisor" }]}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">

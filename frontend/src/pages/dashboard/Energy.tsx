@@ -60,6 +60,7 @@ export default function Energy() {
       <PageHeader
         title="Factory Energy Intelligence"
         subtitle="Petakan konsumsi energi dari proses hingga SKU untuk mengetahui energy intensity dan true energy cost."
+        breadcrumbs={[{ label: "FISH Operations", href: "/app/overview" }, { label: "Factory Energy" }]}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
