@@ -51,9 +51,14 @@ export function NotificationDrawer() {
               {notifs.map((n) => {
                 const Icon = severityIcon[n.severity];
                 return (
-                  <div
+                  <button
                     key={n.id}
-                    className={cn("flex gap-3 border-b border-aruna-border/70 px-4 py-3 last:border-0", !n.read && "bg-aruna-light1/40")}
+                    type="button"
+                    onClick={() => setNotifs((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)))}
+                    className={cn(
+                      "flex w-full gap-3 border-b border-aruna-border/70 px-4 py-3 text-left last:border-0 hover:bg-aruna-light1/60",
+                      !n.read && "bg-aruna-light1/40"
+                    )}
                   >
                     <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", severityColor[n.severity])}>
                       <Icon className="h-4 w-4" />
@@ -63,7 +68,7 @@ export function NotificationDrawer() {
                       <p className="mt-0.5 text-xs text-aruna-textSecondary">{n.description}</p>
                       <p className="mt-1 text-[11px] text-aruna-textSecondary/70">{n.time}</p>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

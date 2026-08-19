@@ -57,21 +57,33 @@ export default function Contact() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           {/* Contact details */}
           <div className="space-y-5">
-            {contactDetails.map((c) => (
-              <Card key={c.label} className="p-5">
-                <div className="flex items-start gap-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">
-                    <c.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-aruna-textSecondary">
-                      {c.label}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-aruna-text">{c.value}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
+            {contactDetails.map((c) => {
+              const href =
+                c.label === "Email"
+                  ? `mailto:${c.value}`
+                  : c.label === "Telepon"
+                  ? `tel:${c.value.replace(/[^\d+]/g, "")}`
+                  : undefined;
+              const Wrapper = href ? "a" : "div";
+              return (
+                <Card key={c.label} className="p-5">
+                  <Wrapper
+                    {...(href ? { href } : {})}
+                    className={`flex items-start gap-3.5 ${href ? "transition-opacity hover:opacity-80" : ""}`}
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">
+                      <c.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-aruna-textSecondary">
+                        {c.label}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-aruna-text">{c.value}</p>
+                    </div>
+                  </Wrapper>
+                </Card>
+              );
+            })}
             <div className="flex items-start gap-2 rounded-lg border border-aruna-border bg-aruna-light1/60 p-4 text-xs text-aruna-textSecondary">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-aruna-secondary" />
               Detail kontak bersifat ilustratif untuk kebutuhan prototype business case competition.

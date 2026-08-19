@@ -13,10 +13,21 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
+function readStoredRole(): RoleName {
+  if (typeof window === "undefined") return currentUser.role;
+  const stored = window.localStorage.getItem("aruna_role");
+  return (stored as RoleName) || currentUser.role;
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<RoleName>(currentUser.role);
+  const [role, setRoleState] = useState<RoleName>(readStoredRole);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  function setRole(next: RoleName) {
+    setRoleState(next);
+    window.localStorage.setItem("aruna_role", next);
+  }
 
   return (
     <AppContext.Provider

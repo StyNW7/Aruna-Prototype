@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Fish,
   Mail,
@@ -19,6 +20,7 @@ import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { roleDefinitions } from "@/data/roles";
+import type { RoleName } from "@/types";
 
 const roleIcons: Record<string, typeof Gauge> = {
   "Plant Manager": Gauge,
@@ -33,11 +35,22 @@ export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleName | null>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (selectedRole) {
+      window.localStorage.setItem("aruna_role", selectedRole);
+      const target = roleDefinitions.find((r) => r.name === selectedRole)?.defaultRoute ?? "/app/overview";
+      toast.success(`Masuk sebagai ${selectedRole}.`);
+      navigate(target);
+      return;
+    }
     navigate("/onboarding");
+  }
+
+  function handleForgotPassword() {
+    toast("Tautan reset password telah dikirim ke email Anda (simulasi prototipe).", { icon: "📧" });
   }
 
   return (
@@ -137,9 +150,13 @@ export default function Login() {
                   <input type="checkbox" className="h-4 w-4 rounded border-aruna-border accent-aruna-primary" />
                   Ingat saya
                 </label>
-                <a href="#" className="font-medium text-aruna-primary hover:underline">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="font-medium text-aruna-primary hover:underline"
+                >
                   Lupa password?
-                </a>
+                </button>
               </div>
 
               <Button type="submit" variant="gradient" size="lg" className="w-full">

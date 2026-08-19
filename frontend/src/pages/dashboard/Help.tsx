@@ -75,14 +75,20 @@ export default function Help() {
             <CardDescription>Jam operasional 08.00–17.00 WIB.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
-            <div className="flex items-center gap-3 rounded-lg border border-aruna-border p-3">
+            <a
+              href="mailto:support@arunajaya.co.id"
+              className="flex items-center gap-3 rounded-lg border border-aruna-border p-3 transition-colors hover:bg-aruna-light1"
+            >
               <Mail className="h-4 w-4 text-aruna-primary" />
               <span className="text-sm text-aruna-text">support@arunajaya.co.id</span>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg border border-aruna-border p-3">
+            </a>
+            <a
+              href="tel:+627511234567"
+              className="flex items-center gap-3 rounded-lg border border-aruna-border p-3 transition-colors hover:bg-aruna-light1"
+            >
               <Phone className="h-4 w-4 text-aruna-primary" />
               <span className="text-sm text-aruna-text">(0751) 123-4567</span>
-            </div>
+            </a>
           </CardContent>
         </Card>
       </div>
