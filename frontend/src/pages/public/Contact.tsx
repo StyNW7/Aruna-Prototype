@@ -3,7 +3,7 @@ import { MapPin, Mail, Phone, Clock, Send, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { PageHero } from "@/components/public/PageHero";
 
 const contactDetails = [
   {
@@ -38,20 +38,43 @@ export default function Contact() {
 
   return (
     <div className="pb-24">
-      <section className="border-b border-aruna-border bg-white py-16">
-        <div className="container">
-          <Badge variant="primary" className="mb-4">
-            Kontak
-          </Badge>
-          <h1 className="max-w-3xl font-display text-4xl font-bold text-aruna-text">
-            Hubungi Tim Aruna
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-aruna-textSecondary">
-            Ada pertanyaan seputar operasional, kemitraan, atau FISH Framework? Tim kami siap
-            membantu.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        badge="Kontak"
+        badgeIcon={Send}
+        title="Hubungi Tim Aruna"
+        description="Ada pertanyaan seputar operasional, kemitraan, atau FISH Framework? Tim kami siap membantu."
+        aside={
+          <Card className="overflow-hidden shadow-elevated">
+            <div className="relative h-36 aruna-gradient">
+              <div className="absolute inset-0 line-grid-light opacity-70" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <span className="absolute inset-0 -m-3 animate-ping rounded-full bg-white/30" />
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white text-aruna-primary shadow-lg">
+                  <MapPin className="h-5 w-5" />
+                </div>
+              </div>
+              <span className="absolute bottom-3 left-4 rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-aruna-dark">
+                1°02′ S · 100°23′ E
+              </span>
+            </div>
+            <div className="p-5">
+              <p className="font-display text-base font-semibold text-aruna-text">Hub Pelabuhan Bungus</p>
+              <p className="mt-1 text-sm text-aruna-textSecondary">Kec. Bungus Teluk Kabung, Padang, Sumatera Barat</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a href="mailto:operasional@arunajaya.co.id" className="inline-flex items-center gap-1.5 rounded-full border border-aruna-border bg-white px-3 py-1.5 text-xs font-medium text-aruna-text transition-colors hover:border-aruna-medium hover:text-aruna-primary">
+                  <Mail className="h-3.5 w-3.5" /> Email
+                </a>
+                <a href="tel:+62751123456" className="inline-flex items-center gap-1.5 rounded-full border border-aruna-border bg-white px-3 py-1.5 text-xs font-medium text-aruna-text transition-colors hover:border-aruna-medium hover:text-aruna-primary">
+                  <Phone className="h-3.5 w-3.5" /> Telepon
+                </a>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-aruna-successBg px-3 py-1.5 text-xs font-medium text-aruna-success">
+                  <Clock className="h-3.5 w-3.5" /> Senin–Sabtu 07.00–17.00
+                </span>
+              </div>
+            </div>
+          </Card>
+        }
+      />
 
       <section className="container py-16">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">

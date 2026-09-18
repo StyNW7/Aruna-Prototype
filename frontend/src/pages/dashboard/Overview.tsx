@@ -18,6 +18,9 @@ import {
   Calculator,
   ClipboardList,
   SlidersHorizontal,
+  Star,
+  ArrowRight,
+  CalendarDays,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -44,7 +47,9 @@ import { CHART_COLORS, CHART_WARNING, chartTooltipStyle } from "@/components/cha
 import { formatKg, formatPercent, formatRupiahJuta, formatKwh, formatNumber } from "@/utils/format";
 import { supplyBatches } from "@/data/supply";
 import { skus } from "@/data/skus";
-import { currentUser } from "@/data/roles";
+import { currentUser, roleDefinitions } from "@/data/roles";
+import { navGroups } from "@/components/layout/nav-config";
+import { useAppContext } from "@/context/AppContext";
 
 const sizeGradeData = ["14 UP", "20 UP", "30 UP"].map((grade) => ({
   grade,
@@ -84,6 +89,18 @@ const alerts = [
   { icon: Clock, tone: "warning" as const, text: "Batch BT-2408-12 (14 UP, Grade C) mendekati batas umur stok, prioritaskan proses." },
 ];
 
+const allNavItems = navGroups.flatMap((g) => g.items);
+
+// Tren 6 periode terakhir untuk sparkline KPI (ilustratif)
+const kpiTrends = {
+  supply: [16200, 16900, 17300, 17100, 17800, 18750],
+  fg: [9600, 9900, 10200, 10100, 10500, 10980],
+  yield: [57.8, 58.2, 58.6, 58.4, 58.9, 59.1],
+  margin: [512, 538, 549, 556, 561, 574],
+  energy: [0.081, 0.079, 0.078, 0.077, 0.078, 0.077],
+  excess: [5.2, 5.6, 5.9, 6.0, 6.2, 6.3],
+};
+
 const alertToneClass: Record<string, string> = {
   warning: "bg-aruna-warningBg text-aruna-warning",
   primary: "bg-aruna-light1 text-aruna-primary",
@@ -112,8 +129,22 @@ function greetingByHour(): string {
   return "Malam";
 }
 
+function shiftByHour(h: number): string {
+  if (h >= 6 && h < 14) return "Shift 1 · 06.00–14.00";
+  if (h >= 14 && h < 22) return "Shift 2 · 14.00–22.00";
+  return "Shift 3 · 22.00–06.00";
+}
+
 export default function Overview() {
   const [loading, setLoading] = useState(true);
+  const { role } = useAppContext();
+  const roleDef = roleDefinitions.find((r) => r.name === role);
+  const focusItems = (roleDef?.focusAreas ?? [])
+    .map((f) => allNavItems.find((n) => n.label === f))
+    .filter((n): n is (typeof allNavItems)[number] => Boolean(n));
+
+  const now = new Date();
+  const todayLabel = new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 550);
@@ -123,94 +154,159 @@ export default function Overview() {
   return (
     <div>
       {/* Hero greeting header */}
-      <div className="mb-6 overflow-hidden rounded-2xl border border-aruna-border aruna-gradient p-6 text-white shadow-card sm:p-8">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-medium text-white/80">{currentUser.plant}</p>
-            <h1 className="mt-1 font-display text-2xl font-bold sm:text-[28px]">
-              Selamat {greetingByHour()}, {currentUser.role}
+      <div className="relative mb-6 overflow-hidden rounded-2xl border border-aruna-border bg-aruna-gradient-dark p-6 text-white shadow-elevated animate-fade-up sm:p-8">
+        <div className="pointer-events-none absolute inset-0 line-grid-light opacity-50" />
+        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-aruna-medium/30 blur-3xl" />
+        <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-white/80">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1">
+                <CalendarDays className="h-3.5 w-3.5" />
+                {todayLabel}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1">
+                <span className="live-dot h-1.5 w-1.5 rounded-full bg-aruna-success" />
+                {shiftByHour(now.getHours())}
+              </span>
+            </div>
+            <h1 className="mt-3 font-display text-2xl font-bold sm:text-[28px]">
+              Selamat {greetingByHour()}, {currentUser.name.split(" ")[0]}
             </h1>
             <p className="mt-1.5 max-w-xl text-sm text-white/85">
-              Berikut kondisi operasional Hub Bungus hari ini. Data mencerminkan supply masuk, kapasitas, dan
-              rekomendasi alokasi produksi resource-driven.
+              Anda melihat dashboard sebagai <strong className="font-semibold text-white">{role}</strong> — {currentUser.plant}.
+              Data mencerminkan supply masuk, kapasitas, dan rekomendasi alokasi produksi resource-driven.
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <Button asChild variant="secondary" size="default" className="bg-white text-aruna-primary hover:bg-white/90">
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Button asChild size="default" className="bg-white text-aruna-primary shadow-md hover:bg-white/90 hover:shadow-lg">
               <Link to="/app/optimizer">
                 <Calculator className="h-4 w-4" />
                 Jalankan Optimizer
               </Link>
             </Button>
+            <Button asChild variant="outline" className="border-white/30 bg-white/10 text-white hover:border-white/60 hover:bg-white/15">
+              <Link to="/app/reports">Lihat Reports</Link>
+            </Button>
           </div>
         </div>
+
+        {focusItems.length > 0 && (
+          <div className="relative mt-6 border-t border-white/15 pt-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/60">Fokus untuk {role}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {focusItems.map((f) => (
+                <Link
+                  key={f.href}
+                  to={f.href}
+                  className="group inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  <Star className="h-3 w-3 fill-aruna-medium text-aruna-medium" />
+                  {f.label}
+                  <ArrowRight className="h-3 w-3 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* KPI grid */}
       {loading ? (
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
+            <Skeleton key={i} className="h-36 rounded-xl shimmer" />
           ))}
         </div>
       ) : (
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="stagger mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
           <KPICard
             label="Incoming Supply"
             value={formatKg(18750)}
             icon={Ship}
-            deltaLabel="+8,4% dari periode sebelumnya"
+            deltaLabel="+8,4%"
             deltaDirection="up"
             deltaTone="positive"
+            helperText="vs periode lalu"
+            sparkline={kpiTrends.supply}
           />
           <KPICard
             label="Expected Finished Goods"
             value={formatKg(10980)}
             icon={Package}
-            deltaLabel="+5,1% dari periode sebelumnya"
+            deltaLabel="+5,1%"
             deltaDirection="up"
             deltaTone="positive"
+            helperText="vs periode lalu"
+            sparkline={kpiTrends.fg}
           />
           <KPICard
             label="Average Yield"
             value={formatPercent(59.1)}
             icon={TrendingUp}
-            helperText="Loin ke finished goods"
+            deltaLabel="+0,2pp"
+            deltaDirection="up"
+            deltaTone="positive"
+            helperText="Loin → FG"
+            accent="success"
+            sparkline={kpiTrends.yield}
           />
           <KPICard
             label="Expected Margin"
             value={formatRupiahJuta(574)}
             icon={DollarSign}
-            deltaLabel="+2,3% dari periode sebelumnya"
+            deltaLabel="+2,3%"
             deltaDirection="up"
             deltaTone="positive"
+            helperText="vs periode lalu"
+            accent="success"
+            sparkline={kpiTrends.margin}
           />
           <KPICard
             label="Energy Intensity"
-            value={formatKwh(0.077)}
+            value={formatKwh(0.077, 3)}
             icon={Zap}
-            helperText="per kg finished goods"
+            deltaLabel="-0,004"
+            deltaDirection="down"
+            deltaTone="positive"
+            helperText="per kg FG"
+            accent="warning"
+            sparkline={kpiTrends.energy}
           />
           <KPICard
             label="Excess Product Ratio"
             value={formatPercent(6.3)}
             icon={AlertOctagon}
-            deltaLabel="+1,2pp dari target"
+            deltaLabel="+1,2pp"
             deltaDirection="up"
             deltaTone="negative"
+            helperText="dari target 5,1%"
+            accent="error"
+            sparkline={kpiTrends.excess}
           />
         </div>
       )}
 
       {/* Status cards row */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statusMetrics.map((m) => (
-          <Card key={m.label} className="p-5">
+          <Card key={m.label} interactive className="p-5">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-aruna-textSecondary">{m.label}</p>
-              <m.icon className="h-4 w-4 text-aruna-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">
+                <m.icon className="h-4 w-4" />
+              </div>
             </div>
-            <p className="mt-2 font-display text-xl font-bold text-aruna-text">{formatPercent(m.value)}</p>
+            <div className="mt-2 flex items-end justify-between">
+              <p className="font-display text-xl font-bold text-aruna-text">{formatPercent(m.value)}</p>
+              <span
+                className={`text-[11px] font-semibold ${
+                  m.variant === "warning" ? "text-aruna-warning" : m.variant === "success" ? "text-aruna-success" : "text-aruna-textSecondary"
+                }`}
+              >
+                {m.variant === "warning" ? "Perlu perhatian" : m.variant === "success" ? "Optimal" : "Normal"}
+              </span>
+            </div>
             <Progress value={m.value} variant={m.variant} className="mt-3" />
           </Card>
         ))}
@@ -300,7 +396,10 @@ export default function Overview() {
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
             {alerts.map((a, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg border border-aruna-border p-3">
+              <div
+                key={i}
+                className="flex items-start gap-3 rounded-lg border border-aruna-border p-3 transition-colors hover:border-aruna-medium/60 hover:bg-aruna-light1/30"
+              >
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${alertToneClass[a.tone]}`}>
                   <a.icon className="h-4 w-4" />
                 </div>
@@ -316,10 +415,11 @@ export default function Overview() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-2.5 pt-0">
             {quickActions.map((qa) => (
-              <Button key={qa.label} asChild variant="outline" className="justify-start">
+              <Button key={qa.label} asChild variant="outline" className="group justify-start">
                 <Link to={qa.href}>
                   <qa.icon className="h-4 w-4 text-aruna-primary" />
-                  {qa.label}
+                  <span className="flex-1 text-left">{qa.label}</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-aruna-textSecondary opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
                 </Link>
               </Button>
             ))}

@@ -22,6 +22,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHero } from "@/components/public/PageHero";
 
 interface PillarDetail {
   letter: string;
@@ -128,22 +129,32 @@ export default function FishFramework() {
   return (
     <div className="pb-24">
       {/* HERO */}
-      <section className="border-b border-aruna-border bg-white py-16">
-        <div className="container">
-          <Badge variant="primary" className="mb-4">
-            Solusi FISH
-          </Badge>
-          <h1 className="max-w-3xl font-display text-4xl font-bold text-aruna-text">
-            Framework FISH: Empat Pilar Menuju Resource-Driven Value Optimization
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-aruna-textSecondary">
-            FISH — Factory Energy Intelligence, Integrated Value Optimization, Smart Operations
-            Dashboard, dan Harmonized SOP & Decision Rules — bekerja sebagai satu sistem yang
-            saling melengkapi, mengubah cara Aruna mengelola energi, nilai produk, dan keputusan
-            operasional.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        badge="Solusi FISH"
+        badgeIcon={Sparkles}
+        title="Framework FISH: Empat Pilar Menuju Resource-Driven Value Optimization"
+        description="FISH — Factory Energy Intelligence, Integrated Value Optimization, Smart Operations Dashboard, dan Harmonized SOP & Decision Rules — bekerja sebagai satu sistem yang saling melengkapi, mengubah cara Aruna mengelola energi, nilai produk, dan keputusan operasional."
+        aside={
+          <div className="grid grid-cols-2 gap-3">
+            {pillars.map((p, i) => (
+              <a
+                key={p.letter}
+                href={`#${p.letter}`}
+                className={`group rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-elevated ${
+                  i % 3 === 0 ? "border-transparent aruna-gradient text-white" : "border-aruna-border bg-white text-aruna-text"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-3xl font-bold">{p.letter}</span>
+                  <p.icon className={`h-5 w-5 ${i % 3 === 0 ? "text-white/80" : "text-aruna-primary"}`} />
+                </div>
+                <p className="mt-3 text-sm font-semibold leading-snug">{p.name}</p>
+                <p className={`mt-1 text-xs ${i % 3 === 0 ? "text-white/75" : "text-aruna-textSecondary"}`}>{p.tagline}</p>
+              </a>
+            ))}
+          </div>
+        }
+      />
 
       {/* PILLAR NAV */}
       <section className="container py-10">

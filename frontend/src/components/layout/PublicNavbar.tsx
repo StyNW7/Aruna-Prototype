@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Waves, Menu, X } from "lucide-react";
+import { Waves, Menu, X, LayoutDashboard, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,8 +32,8 @@ export function PublicNavbar() {
       )}
     >
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg aruna-gradient text-white shadow-sm">
+        <Link to="/" className="group flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg aruna-gradient text-white shadow-sm transition-transform group-hover:scale-105">
             <Waves className="h-5 w-5" />
           </div>
           <div className="leading-tight">
@@ -50,8 +50,11 @@ export function PublicNavbar() {
               end={link.href === "/"}
               className={({ isActive }) =>
                 cn(
-                  "rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
-                  isActive ? "text-aruna-primary" : "text-aruna-text hover:text-aruna-primary"
+                  "relative rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
+                  "after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-aruna-primary after:transition-transform after:duration-200",
+                  isActive
+                    ? "text-aruna-primary after:scale-x-100"
+                    : "text-aruna-text after:scale-x-0 hover:text-aruna-primary hover:after:scale-x-100"
                 )
               }
             >
@@ -62,20 +65,31 @@ export function PublicNavbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/masuk">Masuk</Link>
+            <Link to="/masuk">
+              <LogIn className="h-3.5 w-3.5" />
+              Masuk
+            </Link>
           </Button>
           <Button variant="gradient" size="sm" asChild>
-            <Link to="/app/overview">Masuk ke Dashboard</Link>
+            <Link to="/app/overview">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Masuk ke Dashboard
+            </Link>
           </Button>
         </div>
 
-        <button className="text-aruna-text lg:hidden" onClick={() => setMobileOpen((v) => !v)}>
+        <button
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-aruna-text hover:bg-aruna-light1 lg:hidden"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+          aria-expanded={mobileOpen}
+        >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-aruna-border bg-white px-4 pb-4 pt-2 lg:hidden">
+        <div className="border-t border-aruna-border bg-white px-4 pb-4 pt-2 animate-fade-in lg:hidden">
           <nav className="flex flex-col gap-1">
             {links.map((link) => (
               <NavLink
@@ -83,7 +97,12 @@ export function PublicNavbar() {
                 to={link.href}
                 end={link.href === "/"}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-aruna-text hover:bg-aruna-light1"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-lg px-3 py-2.5 text-sm font-medium",
+                    isActive ? "bg-aruna-light1 text-aruna-primary" : "text-aruna-text hover:bg-aruna-light1"
+                  )
+                }
               >
                 {link.label}
               </NavLink>

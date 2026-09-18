@@ -153,3 +153,91 @@ export function exportReportPdf(report: ReportDoc) {
 
   doc.save(`aruna-${slug(report.name)}-${slug(report.period)}.pdf`);
 }
+
+function escapeHtml(value: string | number): string {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * Membuka jendela cetak khusus yang hanya berisi laporan (tanpa sidebar/header dashboard),
+ * lalu memanggil dialog print browser.
+ */
+export function printReport(report: ReportDoc): boolean {
+  const win = window.open("", "_blank", "width=960,height=720");
+  if (!win) return false;
+
+  const summaryHtml = report.summary.length
+    ? `<div class="summary">${report.summary
+        .map((s) => `<div class="tile"><div class="label">${escapeHtml(s.label)}</div><div class="value">${escapeHtml(s.value)}</div></div>`)
+        .join("")}</div>`
+    : "";
+
+  const tablesHtml = report.tables
+    .map(
+      (t) => `
+      <section>
+        <h2>${escapeHtml(t.title)}</h2>
+        <table>
+          <thead><tr>${t.columns.map((c) => `<th class="${c.align ?? "left"}">${escapeHtml(c.label)}</th>`).join("")}</tr></thead>
+          <tbody>${t.rows
+            .map(
+              (row) =>
+                `<tr>${row
+                  .map((cell, i) => `<td class="${t.columns[i]?.align ?? "left"}">${escapeHtml(cell)}</td>`)
+                  .join("")}</tr>`
+            )
+            .join("")}</tbody>
+        </table>
+      </section>`
+    )
+    .join("");
+
+  const notesHtml = report.notes?.length
+    ? `<ul class="notes">${report.notes.map((n) => `<li>${escapeHtml(n)}</li>`).join("")}</ul>`
+    : "";
+
+  win.document.write(`<!doctype html>
+<html lang="id"><head><meta charset="utf-8" />
+<title>${escapeHtml(report.name)} — Aruna FISH</title>
+<style>
+  @page { margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Inter, "Segoe UI", system-ui, sans-serif; color: #1e293b; margin: 0; padding: 32px; font-size: 12px; }
+  .bar { height: 6px; background: linear-gradient(90deg,#016097,#358ebd); border-radius: 4px; margin-bottom: 20px; }
+  h1 { font-size: 20px; margin: 0 0 2px; }
+  .sub { color: #64748b; font-size: 12px; margin: 0 0 4px; }
+  .meta { color: #64748b; font-size: 11px; margin-bottom: 18px; }
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .tile { border: 1px solid #e3eaf0; background: #f7fafc; border-radius: 8px; padding: 10px 12px; }
+  .tile .label { font-size: 10px; color: #64748b; }
+  .tile .value { font-size: 14px; font-weight: 700; color: #016097; margin-top: 2px; }
+  section { margin-bottom: 22px; page-break-inside: avoid; }
+  h2 { font-size: 13px; color: #014b77; margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #e3eaf0; font-size: 11px; }
+  th { background: #016097; color: #fff; text-align: left; font-weight: 600; }
+  tr:nth-child(even) td { background: #f7fafc; }
+  .right { text-align: right; font-variant-numeric: tabular-nums; }
+  .center { text-align: center; }
+  .notes { color: #64748b; font-size: 10.5px; padding-left: 16px; margin-top: 8px; }
+  .footer { margin-top: 28px; color: #94a3b8; font-size: 10px; border-top: 1px solid #e3eaf0; padding-top: 8px; }
+</style></head>
+<body>
+  <div class="bar"></div>
+  <h1>Aruna FISH Operations</h1>
+  <p class="sub">${escapeHtml(report.name)}</p>
+  <p class="meta">Periode: ${escapeHtml(report.period)} &nbsp;|&nbsp; Dibuat: ${escapeHtml(report.generatedAt)}</p>
+  ${summaryHtml}
+  ${tablesHtml}
+  ${notesHtml}
+  <p class="footer">Aruna FISH Operations — Dokumen ilustratif (data mock) untuk kebutuhan business case competition.</p>
+  <script>window.addEventListener("load", function () { setTimeout(function () { window.print(); }, 150); });</script>
+</body></html>`);
+  win.document.close();
+  win.focus();
+  return true;
+}

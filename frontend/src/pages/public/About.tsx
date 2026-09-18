@@ -14,9 +14,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatKg, formatPercent } from "@/utils/format";
+import { PageHero } from "@/components/public/PageHero";
 
 const valueChain = [
   { icon: Anchor, title: "Nelayan", desc: "Nelayan skala kecil di sekitar Teluk Bungus dan pesisir Sumatera Barat menangkap dan menyalurkan hasil laut segar." },
@@ -48,23 +48,39 @@ export default function About() {
   return (
     <div className="pb-24">
       {/* HERO */}
-      <section className="border-b border-aruna-border bg-white py-16">
-        <div className="container">
-          <Badge variant="primary" className="mb-4">
-            <Fish className="h-3.5 w-3.5" />
-            Tentang Aruna
-          </Badge>
-          <h1 className="max-w-3xl font-display text-4xl font-bold text-aruna-text">
-            Platform Perikanan Terintegrasi dari Laut hingga Pasar Global
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-aruna-textSecondary">
-            PT Aruna Jaya Nuswantara adalah integrated fisheries commerce platform yang
-            menghubungkan nelayan skala kecil dengan pasar domestik dan ekspor. Aruna hadir untuk
-            memastikan setiap hasil laut diproses dan disalurkan menjadi produk bernilai tinggi,
-            secara adil dan berkelanjutan.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        badge="Tentang Aruna"
+        badgeIcon={Fish}
+        title="Platform Perikanan Terintegrasi dari Laut hingga Pasar Global"
+        description="PT Aruna Jaya Nuswantara adalah integrated fisheries commerce platform yang menghubungkan nelayan skala kecil dengan pasar domestik dan ekspor. Aruna hadir untuk memastikan setiap hasil laut diproses dan disalurkan menjadi produk bernilai tinggi, secara adil dan berkelanjutan."
+        stats={[
+          { value: "5 tahap", label: "Rantai nilai" },
+          { value: "1 hub", label: "Pelabuhan Bungus" },
+          { value: "Ekspor", label: "Jangkauan pasar" },
+        ]}
+        aside={
+          <Card className="p-5 shadow-elevated">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aruna-textSecondary">Rantai Nilai Aruna</p>
+            <ol className="mt-4 space-y-2.5">
+              {valueChain.map((v, i) => (
+                <li key={v.title} className="flex items-center gap-3">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                      i === 2 ? "aruna-gradient text-white shadow-glow" : "bg-aruna-light1 text-aruna-primary"
+                    }`}
+                  >
+                    <v.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 rounded-lg border border-aruna-border bg-aruna-bg px-3 py-1.5">
+                    <p className="text-sm font-semibold text-aruna-text">{v.title}</p>
+                  </div>
+                  {i < valueChain.length - 1 && <ArrowRight className="hidden h-4 w-4 shrink-0 text-aruna-textSecondary sm:block" />}
+                </li>
+              ))}
+            </ol>
+          </Card>
+        }
+      />
 
       {/* HUB CONTEXT */}
       <section className="container py-16">

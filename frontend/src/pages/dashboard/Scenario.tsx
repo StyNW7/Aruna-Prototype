@@ -268,7 +268,7 @@ export default function Scenario() {
             <ChartCard title="Product Mix" description="Komposisi output hasil optimasi pada skenario saat ini.">
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={(d: any) => `${d.value}%`}>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={(d: { value?: number }) => `${d.value ?? 0}%`}>
                     {pieData.map((entry) => (
                       <Cell key={entry.code} fill={CATEGORY_COLORS[entry.code] ?? CHART_COLORS[0]} />
                     ))}

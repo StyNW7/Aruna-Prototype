@@ -47,13 +47,22 @@ Website terdiri dari dua area besar:
 Seluruh fitur berikut telah diverifikasi berfungsi penuh (bukan placeholder):
 
 - **Reports** — preview laporan dalam modal, export ke **PDF** (branded, tabel rapi via `jspdf` + `jspdf-autotable`) dan **CSV** (download file nyata via Blob), untuk 8 jenis laporan (Production Summary, Energy Efficiency, SKU Profitability, Yield Analysis, Excess Report, Shipment Report, Plan vs Actual, Management Summary), dengan filter periode aktif.
-- **Role switching** — beralih tampilan antar 6 role (Plant Manager, Production Planner, Finance, Engineering, Quality Control, Commercial) baik dari halaman Login maupun dari header dashboard, tersimpan lewat `localStorage` sehingga konsisten antar sesi.
-- **Global Search, Notifikasi, Profile Menu** — pencarian di seluruh modul dashboard, panel notifikasi dengan status "sudah dibaca" per item maupun massal, dan menu profil fungsional.
+- **Reports — filter & riwayat** — filter kategori (Produksi/Energi/Finansial/Logistik/Manajemen), pencarian laporan, validasi periode kustom, riwayat export per sesi, tombol **Cetak** yang membuka jendela cetak khusus laporan (tanpa sidebar/header), dan deep-link `/app/reports?preview=<nama>` dari pencarian global.
+- **Role switching yang benar-benar personal** — beralih tampilan antar 6 role (Plant Manager, Production Planner, Finance, Engineering, Quality Control, Commercial) dari halaman Login (kredensial demo terisi otomatis) maupun header dashboard. Role aktif mengubah sapaan & "Fokus untuk role" di Overview, penanda ★ modul fokus di sidebar, serta menu profil; tersimpan lewat `localStorage`.
+- **Global Search (Ctrl/⌘ + K)** — mencari modul, SKU, batch, vessel, shipment, dan seluruh laporan; navigasi keyboard (↑ ↓ Enter Esc), pencarian terakhir tersimpan, dan modul populer saat kosong.
+- **Notifikasi & Profile Menu** — badge jumlah belum dibaca, filter "Belum dibaca", tandai dibaca per item maupun massal, dan menu profil yang mengikuti role aktif.
 - **Production Optimizer & Scenario Simulator** — kalkulasi alokasi produksi dan simulasi skenario "what-if" berbasis data supply/SKU aktual.
 - **Approval Center & SOP** — alur approval dengan status dan aturan keputusan yang terdokumentasi.
 - **Insight (artikel publik)** — 6 artikel/studi kasus dengan konten lengkap yang bisa dibuka penuh lewat modal, bukan sekadar teaser.
 - **Kontak & Help** — tautan `mailto:`/`tel:` yang benar-benar aktif, bukan teks statis.
 - Modul operasional lain yang sepenuhnya interaktif: Supply Intake, Inventory, Traceability, Factory Energy, Value Optimization, Pricing Advisor, Production Plan, Shipment Planner, Excess & Side Product, Quality Control, Plan vs Actual (Performance), Settings.
+
+## Visual System
+
+- Hero halaman publik memakai komponen `PageHero` (mesh gradient + dot grid + slot konten kanan) dan animasi reveal-on-scroll (`Reveal`, `Stagger`, `CountUp` berbasis `framer-motion`, menghormati `prefers-reduced-motion`).
+- Beranda: ticker modul dashboard, "Dampak Terukur" dengan angka animasi, preview dashboard dengan KPI sparkline.
+- Dashboard: KPI card dengan sparkline & aksen warna, sidebar dengan indikator aktif dan penanda modul fokus role, header dengan tanggal/shift aktif, transisi masuk per halaman.
+- Utilitas CSS di `src/index.css`: `.mesh-hero`, `.dot-grid`, `.line-grid-light`, `.hover-lift`, `.gradient-border`, `.stagger`, `.live-dot`, `.marquee`.
 
 ## Tech Stack
 

@@ -1,11 +1,16 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Menambahkan efek lift + border highlight saat hover */
+  interactive?: boolean;
+}
+
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, interactive = false, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("rounded-xl border border-aruna-border bg-white shadow-card", className)}
+      className={cn("rounded-xl border border-aruna-border bg-white shadow-card", interactive && "hover-lift", className)}
       {...props}
     />
   )

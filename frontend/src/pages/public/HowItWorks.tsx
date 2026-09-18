@@ -13,8 +13,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHero } from "@/components/public/PageHero";
 
 const steps = [
   {
@@ -72,20 +72,34 @@ const steps = [
 export default function HowItWorks() {
   return (
     <div className="pb-24">
-      <section className="border-b border-aruna-border bg-white py-16">
-        <div className="container">
-          <Badge variant="primary" className="mb-4">
-            Cara Kerja
-          </Badge>
-          <h1 className="max-w-3xl font-display text-4xl font-bold text-aruna-text">
-            Dari Ikan Masuk Hingga Keputusan Produksi Tereksekusi
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-aruna-textSecondary">
-            Sepuluh langkah berikut menunjukkan bagaimana FISH mengubah satu batch bahan baku
-            menjadi keputusan produksi yang optimal, terukur, dan dapat dipertanggungjawabkan.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        badge="Cara Kerja"
+        badgeIcon={RefreshCcw}
+        title="Dari Ikan Masuk Hingga Keputusan Produksi Tereksekusi"
+        description="Sepuluh langkah berikut menunjukkan bagaimana FISH mengubah satu batch bahan baku menjadi keputusan produksi yang optimal, terukur, dan dapat dipertanggungjawabkan."
+        stats={[
+          { value: `${steps.length} langkah`, label: "Alur end-to-end" },
+          { value: "4 pilar", label: "Terlibat" },
+          { value: "1 siklus", label: "Terus berulang" },
+        ]}
+        aside={
+          <Card className="p-5 shadow-elevated">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aruna-textSecondary">Ringkasan Alur</p>
+            <ol className="mt-4 space-y-2">
+              {steps.slice(0, 5).map((s, i) => (
+                <li key={s.title} className="flex items-center gap-3 rounded-lg border border-aruna-border bg-aruna-bg px-3 py-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full aruna-gradient font-display text-xs font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <s.icon className="h-4 w-4 shrink-0 text-aruna-primary" />
+                  <p className="text-sm font-medium text-aruna-text">{s.title}</p>
+                </li>
+              ))}
+              <li className="px-3 pt-1 text-xs text-aruna-textSecondary">+ {steps.length - 5} langkah lanjutan di bawah</li>
+            </ol>
+          </Card>
+        }
+      />
 
       <section className="container py-16">
         {/* Desktop timeline */}

@@ -27,6 +27,25 @@ export interface ReportDoc {
   notes?: string[];
 }
 
+export interface ReportDefinition {
+  name: string;
+  description: string;
+  /** Kategori untuk filter di halaman Reports */
+  category: "Produksi" | "Energi" | "Finansial" | "Logistik" | "Manajemen";
+}
+
+// Katalog laporan — dipakai halaman Reports dan pencarian global
+export const REPORT_DEFINITIONS: ReportDefinition[] = [
+  { name: "Production Summary", description: "Ringkasan rencana dan realisasi produksi per batch dan SKU.", category: "Produksi" },
+  { name: "Energy Efficiency", description: "Konsumsi energi, intensitas kWh/kg, dan biaya energi per proses.", category: "Energi" },
+  { name: "SKU Profitability", description: "Margin dan profitabilitas setiap SKU berdasarkan harga dan biaya.", category: "Finansial" },
+  { name: "Yield Analysis", description: "Analisis yield dari Whole Fish hingga Finished Goods per tahap.", category: "Produksi" },
+  { name: "Excess Report", description: "Rekap excess product, side product, dan loss beserta alokasinya.", category: "Produksi" },
+  { name: "Shipment Report", description: "Detail pengiriman, utilisasi kontainer, dan nilai ekspor per buyer.", category: "Logistik" },
+  { name: "Plan vs Actual", description: "Perbandingan KPI rencana terhadap realisasi lintas siklus produksi.", category: "Manajemen" },
+  { name: "Management Summary", description: "Ringkasan eksekutif seluruh KPI operasional untuk manajemen.", category: "Manajemen" },
+];
+
 function nowStr() {
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",

@@ -35,8 +35,11 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions, badge }: Pag
             ))}
           </nav>
         )}
-        <div className="flex items-center gap-3">
-          <h1 className="font-display text-2xl font-bold text-aruna-text sm:text-[28px]">{title}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="relative font-display text-2xl font-bold tracking-tight text-aruna-text sm:text-[28px]">
+            <span className="absolute -left-4 top-1/2 hidden h-6 w-1 -translate-y-1/2 rounded-full aruna-gradient lg:block" />
+            {title}
+          </h1>
           {badge}
         </div>
         {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-aruna-textSecondary">{subtitle}</p>}

@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { PageHero } from "@/components/public/PageHero";
 
 const articles = [
   {
@@ -105,24 +106,41 @@ export default function Insight() {
   const [activeArticle, setActiveArticle] = useState<(typeof articles)[number] | null>(null);
   return (
     <div className="pb-24">
-      <section className="border-b border-aruna-border bg-white py-16">
-        <div className="container">
-          <Badge variant="primary" className="mb-4">
-            Insight
-          </Badge>
-          <h1 className="max-w-3xl font-display text-4xl font-bold text-aruna-text">
-            Wawasan Seputar Optimalisasi Nilai Perikanan
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-aruna-textSecondary">
-            Kumpulan artikel dan studi kasus seputar penerapan FISH — dari efisiensi energi hingga
-            strategi optimalisasi production mix.
-          </p>
-          <div className="mt-6 flex items-center gap-2 rounded-lg border border-aruna-border bg-aruna-light1/60 px-4 py-2.5 text-sm text-aruna-textSecondary">
-            <Info className="h-4 w-4 shrink-0 text-aruna-secondary" />
-            Konten ilustratif untuk prototype — digunakan untuk keperluan business case competition.
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge="Insight"
+        badgeIcon={TrendingUp}
+        title="Wawasan Seputar Optimalisasi Nilai Perikanan"
+        description="Kumpulan artikel dan studi kasus seputar penerapan FISH — dari efisiensi energi hingga strategi optimalisasi production mix."
+        stats={[
+          { value: `${articles.length} artikel`, label: "Tersedia" },
+          { value: `${new Set(articles.map((a) => a.category)).size} topik`, label: "Kategori" },
+        ]}
+        aside={
+          <Card className="p-5 shadow-elevated">
+            <p className="text-xs font-semibold uppercase tracking-wide text-aruna-textSecondary">Artikel Unggulan</p>
+            <button
+              type="button"
+              onClick={() => setActiveArticle(articles[0])}
+              className="group mt-3 w-full rounded-xl border border-aruna-border bg-aruna-bg p-4 text-left transition-colors hover:border-aruna-medium"
+            >
+              <div className="flex items-center justify-between">
+                <Badge variant="outline">{articles[0].category}</Badge>
+                <ArrowUpRight className="h-4 w-4 text-aruna-textSecondary transition-colors group-hover:text-aruna-primary" />
+              </div>
+              <p className="mt-3 font-display text-base font-semibold text-aruna-text">{articles[0].title}</p>
+              <p className="mt-1.5 line-clamp-2 text-sm text-aruna-textSecondary">{articles[0].excerpt}</p>
+              <p className="mt-3 inline-flex items-center gap-1 text-xs text-aruna-textSecondary">
+                <Clock className="h-3.5 w-3.5" />
+                {articles[0].readTime}
+              </p>
+            </button>
+            <div className="mt-4 flex items-start gap-2 rounded-lg bg-aruna-light1/60 px-3 py-2 text-xs text-aruna-textSecondary">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-aruna-secondary" />
+              Konten ilustratif untuk prototype — digunakan untuk keperluan business case competition.
+            </div>
+          </Card>
+        }
+      />
 
       <section className="container py-16">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

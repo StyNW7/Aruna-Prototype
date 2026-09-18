@@ -39,7 +39,11 @@ import {
   Bar,
 } from "recharts";
 import { CHART_COLORS, CHART_GRID_COLOR, CHART_AXIS_COLOR, chartTooltipStyle } from "@/components/charts/chart-theme";
-import { formatKg, formatPercent, formatRupiahJuta } from "@/utils/format";
+import { formatKg, formatPercent, formatRupiahJuta, formatNumber } from "@/utils/format";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { CountUp } from "@/components/motion/CountUp";
+import { SectionHeading } from "@/components/public/SectionHeading";
+import { navGroups } from "@/components/layout/nav-config";
 
 const challenges = [
   {
@@ -146,20 +150,32 @@ const mixPreview = [
   { sku: "Ground", value: 12 },
 ];
 
+// Seluruh modul dashboard, ditampilkan sebagai ticker berjalan di bawah hero
+const moduleTicker = navGroups.flatMap((g) => g.items).filter((i) => !["/app/settings", "/app/help"].includes(i.href));
+
+const impactMetrics = [
+  { value: 18.4, suffix: "%", label: "Efisiensi energi per kg output", decimals: 1 },
+  { value: 12.7, suffix: "%", label: "Uplift profit dari production mix", decimals: 1 },
+  { value: 5.4, suffix: "%", label: "Reduksi excess & side product", decimals: 1 },
+  { value: 19, suffix: "", label: "Modul operasional terintegrasi", decimals: 0 },
+];
+
 export default function Home() {
   return (
     <div className="pb-24">
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-aruna-border bg-white">
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[32rem] w-[32rem] rounded-full bg-aruna-light1 blur-3xl" />
-        <div className="pointer-events-none absolute -left-32 bottom-0 h-80 w-80 rounded-full bg-aruna-light2/60 blur-3xl" />
-        <div className="container relative grid gap-14 py-20 lg:grid-cols-2 lg:items-center lg:py-28">
-          <div>
-            <Badge variant="primary" className="mb-5">
+      <section className="relative overflow-hidden border-b border-aruna-border mesh-hero">
+        <div className="pointer-events-none absolute inset-0 dot-grid opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
+        <div className="pointer-events-none absolute -right-40 -top-40 h-[32rem] w-[32rem] rounded-full bg-aruna-medium/25 blur-3xl animate-float-slow" />
+        <div className="pointer-events-none absolute -left-32 bottom-0 h-80 w-80 rounded-full bg-aruna-light2/80 blur-3xl animate-float" />
+
+        <div className="container relative grid gap-14 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-28">
+          <Reveal immediate>
+            <Badge variant="primary" className="mb-5 shadow-sm">
               <Fish className="h-3.5 w-3.5" />
               FISH Framework — PT Aruna Jaya Nuswantara
             </Badge>
-            <h1 className="font-display text-4xl font-bold leading-tight text-aruna-text sm:text-5xl">
+            <h1 className="font-display text-4xl font-bold leading-[1.1] tracking-tight text-aruna-text sm:text-5xl lg:text-[56px]">
               Optimalkan Setiap Ikan Menjadi{" "}
               <span className="aruna-gradient-text">Nilai Berkelanjutan Tertinggi.</span>
             </h1>
@@ -174,53 +190,63 @@ export default function Home() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/app/overview">Masuk ke Dashboard</Link>
+              <Button asChild size="lg" variant="outline" className="bg-white/80 backdrop-blur">
+                <Link to="/app/overview">
+                  <LayoutDashboard className="h-4 w-4 text-aruna-primary" />
+                  Masuk ke Dashboard
+                </Link>
               </Button>
             </div>
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-aruna-textSecondary">
+            <dl className="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-aruna-border/80 pt-6">
               <div>
-                <span className="font-display text-xl font-bold text-aruna-text">
-                  {formatKg(53899)}
-                </span>{" "}
-                total supply historis
+                <dd className="font-display text-2xl font-bold text-aruna-text">
+                  <CountUp value={53899} format={(n) => formatNumber(n)} />
+                  <span className="text-base font-semibold text-aruna-textSecondary"> kg</span>
+                </dd>
+                <dt className="mt-0.5 text-xs text-aruna-textSecondary">total supply historis</dt>
               </div>
               <div>
-                <span className="font-display text-xl font-bold text-aruna-text">
-                  {formatPercent(59.07)}
-                </span>{" "}
-                yield rata-rata Loin
+                <dd className="font-display text-2xl font-bold text-aruna-text">
+                  <CountUp value={59.07} format={(n) => formatPercent(n, 2)} />
+                </dd>
+                <dt className="mt-0.5 text-xs text-aruna-textSecondary">yield rata-rata Loin</dt>
               </div>
               <div>
-                <span className="font-display text-xl font-bold text-aruna-text">4 pilar</span> FISH
+                <dd className="font-display text-2xl font-bold text-aruna-text">4 pilar</dd>
+                <dt className="mt-0.5 text-xs text-aruna-textSecondary">framework FISH</dt>
               </div>
-            </div>
-          </div>
+            </dl>
+          </Reveal>
 
-          {/* Abstract flow visual */}
-          <div className="relative">
-            <Card className="p-6 shadow-soft">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-aruna-textSecondary">
-                Alur Optimalisasi Nilai
-              </p>
-              <div className="flex flex-col gap-3">
+          {/* Value flow visual */}
+          <Reveal immediate delay={0.12} from="left" className="relative">
+            <div className="pointer-events-none absolute -inset-4 rounded-[28px] bg-gradient-to-br from-aruna-primary/10 via-transparent to-aruna-medium/20 blur-2xl" />
+            <Card className="relative overflow-hidden p-6 shadow-elevated">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-aruna-textSecondary">
+                  Alur Optimalisasi Nilai
+                </p>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-aruna-successBg px-2 py-0.5 text-[11px] font-semibold text-aruna-success">
+                  <span className="live-dot h-1.5 w-1.5 rounded-full bg-aruna-success" />
+                  Live
+                </span>
+              </div>
+              <div className="mt-4 flex flex-col gap-3">
                 {[
-                  { label: "Whole Fish / WGG", sub: "Bahan baku masuk", icon: Fish },
-                  { label: "Fresh Loin", sub: "Yield ~59,07%", icon: Layers },
-                  { label: "Optimizer FISH", sub: "Alokasi nilai tertinggi", icon: Sparkles },
-                  { label: "SKU Finished Goods", sub: "SAKU · Steak · Poke · dst", icon: Boxes },
+                  { label: "Whole Fish / WGG", sub: "Bahan baku masuk", icon: Fish, tone: "bg-aruna-light1 text-aruna-primary" },
+                  { label: "Fresh Loin", sub: "Yield ~59,07%", icon: Layers, tone: "bg-aruna-light1 text-aruna-primary" },
+                  { label: "Optimizer FISH", sub: "Alokasi nilai tertinggi", icon: Sparkles, tone: "aruna-gradient text-white" },
+                  { label: "SKU Finished Goods", sub: "SAKU · Steak · Poke · dst", icon: Boxes, tone: "bg-aruna-successBg text-aruna-success" },
                 ].map((step, i) => (
                   <div key={step.label} className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">
+                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${step.tone}`}>
                       <step.icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1 rounded-lg border border-aruna-border bg-aruna-bg px-3 py-2">
                       <p className="text-sm font-semibold text-aruna-text">{step.label}</p>
                       <p className="text-xs text-aruna-textSecondary">{step.sub}</p>
                     </div>
-                    {i < 3 && (
-                      <ArrowRight className="hidden h-4 w-4 shrink-0 text-aruna-textSecondary sm:block" />
-                    )}
+                    {i < 3 && <ArrowRight className="hidden h-4 w-4 shrink-0 text-aruna-textSecondary sm:block" />}
                   </div>
                 ))}
               </div>
@@ -230,88 +256,90 @@ export default function Home() {
                     <Zap className="h-3.5 w-3.5" />
                     <span className="text-xs font-medium">Efisiensi Energi</span>
                   </div>
-                  <p className="mt-1 font-display text-lg font-bold text-aruna-text">
-                    {formatPercent(18.4)}
-                  </p>
+                  <p className="mt-1 font-display text-lg font-bold text-aruna-text">{formatPercent(18.4)}</p>
                 </div>
                 <div className="rounded-lg border border-aruna-border bg-aruna-light1 p-3">
                   <div className="flex items-center gap-1.5 text-aruna-primary">
                     <TrendingUp className="h-3.5 w-3.5" />
                     <span className="text-xs font-medium">Uplift Profit</span>
                   </div>
-                  <p className="mt-1 font-display text-lg font-bold text-aruna-text">
-                    {formatPercent(12.7)}
-                  </p>
+                  <p className="mt-1 font-display text-lg font-bold text-aruna-text">{formatPercent(12.7)}</p>
                 </div>
               </div>
             </Card>
+          </Reveal>
+        </div>
+
+        {/* Module ticker */}
+        <div className="marquee relative border-t border-aruna-border/70 bg-white/70 py-3 backdrop-blur">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-white to-transparent" />
+          <div className="marquee-track gap-3">
+            {[...moduleTicker, ...moduleTicker].map((m, i) => (
+              <Link
+                key={`${m.href}-${i}`}
+                to={m.href}
+                className="inline-flex items-center gap-2 rounded-full border border-aruna-border bg-white px-3.5 py-1.5 text-xs font-medium text-aruna-text transition-colors hover:border-aruna-medium hover:text-aruna-primary"
+              >
+                <m.icon className="h-3.5 w-3.5 text-aruna-primary" />
+                {m.label}
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CHALLENGES */}
       <section className="container py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-aruna-secondary">
-            Tantangan Saat Ini
-          </p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-aruna-text">
-            Empat Celah yang Menahan Nilai Produksi
-          </h2>
-          <p className="mt-4 text-aruna-textSecondary">
-            Sebelum FISH, keputusan operasional Aruna berjalan di atas data yang terpisah dan
-            kurang terukur.
-          </p>
-        </div>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {challenges.map((c) => (
-            <Card key={c.title} className="p-6 transition-shadow hover:shadow-soft">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-aruna-errorBg text-aruna-error">
-                <c.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-display text-base font-semibold text-aruna-text">
-                {c.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-aruna-textSecondary">
-                {c.description}
-              </p>
-            </Card>
+        <SectionHeading
+          eyebrow="Tantangan Saat Ini"
+          title="Empat Celah yang Menahan Nilai Produksi"
+          description="Sebelum FISH, keputusan operasional Aruna berjalan di atas data yang terpisah dan kurang terukur."
+        />
+        <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {challenges.map((c, i) => (
+            <StaggerItem key={c.title} className="h-full">
+              <Card interactive className="h-full p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-aruna-errorBg text-aruna-error">
+                    <c.icon className="h-5 w-5" />
+                  </div>
+                  <span className="font-display text-xs font-semibold text-aruna-textSecondary/60">0{i + 1}</span>
+                </div>
+                <h3 className="mt-4 font-display text-base font-semibold text-aruna-text">{c.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-aruna-textSecondary">{c.description}</p>
+              </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </section>
 
       {/* FISH FRAMEWORK */}
-      <section className="border-y border-aruna-border bg-white py-20">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-aruna-secondary">
-              Solusi
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-aruna-text">
-              Framework FISH
-            </h2>
-            <p className="mt-4 text-aruna-textSecondary">
-              Empat pilar yang bekerja bersama mengubah PO-Driven Production menjadi Resource-Driven
-              Value Optimization.
-            </p>
-          </div>
+      <section className="relative overflow-hidden border-y border-aruna-border bg-white py-20">
+        <div className="pointer-events-none absolute inset-0 dot-grid opacity-30 [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]" />
+        <div className="container relative">
+          <SectionHeading
+            eyebrow="Solusi"
+            title="Framework FISH"
+            description="Empat pilar yang bekerja bersama mengubah PO-Driven Production menjadi Resource-Driven Value Optimization."
+          />
 
-          <div className="mt-14 grid gap-4 lg:grid-cols-4">
+          <Stagger className="mt-14 grid gap-4 lg:grid-cols-4">
             {fishPillars.map((p, i) => (
-              <div key={p.letter} className="relative">
-                <Card className="h-full p-6">
+              <StaggerItem key={p.letter} className="relative h-full">
+                <Card interactive className="group h-full p-6">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl aruna-gradient font-display text-xl font-bold text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl aruna-gradient font-display text-xl font-bold text-white shadow-glow transition-transform group-hover:scale-105">
                       {p.letter}
                     </div>
                     <Badge variant="outline">{p.tagline}</Badge>
                   </div>
-                  <h3 className="mt-4 font-display text-base font-semibold text-aruna-text">
-                    {p.name}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-aruna-textSecondary">
-                    {p.description}
-                  </p>
+                  <h3 className="mt-4 font-display text-base font-semibold text-aruna-text">{p.name}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-aruna-textSecondary">{p.description}</p>
+                  <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-aruna-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    <p.icon className="h-3.5 w-3.5" />
+                    Pilar {i + 1} dari 4
+                  </div>
                 </Card>
                 {i < fishPillars.length - 1 && (
                   <div className="absolute right-[-1.1rem] top-1/2 z-10 hidden -translate-y-1/2 lg:block">
@@ -320,254 +348,286 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
 
-          <div className="mt-10 flex justify-center">
+          <Reveal className="mt-10 flex justify-center">
             <Button asChild variant="secondary">
               <Link to="/fish-framework">
                 Lihat detail framework
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* TRANSFORMATION */}
+      {/* IMPACT BAND */}
       <section className="container py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-aruna-secondary">
-            Transformasi Operasional
-          </p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-aruna-text">
-            PO-Driven Production → Resource-Driven Value Optimization
-          </h2>
-        </div>
+        <Reveal>
+          <div className="relative overflow-hidden rounded-2xl bg-aruna-gradient-dark p-8 text-white shadow-elevated sm:p-12">
+            <div className="pointer-events-none absolute inset-0 line-grid-light opacity-60" />
+            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">Dampak Terukur</p>
+                <h2 className="mt-3 font-display text-3xl font-bold leading-tight">
+                  Angka yang berubah ketika keputusan mengikuti supply, bukan sebaliknya.
+                </h2>
+                <p className="mt-4 text-sm leading-relaxed text-white/80">
+                  Estimasi ilustratif berdasarkan simulasi resource-driven pada data supply historis Hub Bungus.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {impactMetrics.map((m) => (
+                  <div key={m.label} className="rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
+                    <p className="font-display text-3xl font-bold sm:text-4xl">
+                      <CountUp value={m.value} format={(n) => formatNumber(n, m.decimals)} />
+                      {m.suffix}
+                    </p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-white/75">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* TRANSFORMATION */}
+      <section className="container pb-20">
+        <SectionHeading
+          eyebrow="Transformasi Operasional"
+          title="PO-Driven Production → Resource-Driven Value Optimization"
+        />
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          <Card className="border-aruna-border p-7">
-            <div className="mb-5 flex items-center gap-2">
-              <XCircle className="h-5 w-5 text-aruna-error" />
-              <h3 className="font-display text-lg font-semibold text-aruna-text">Sebelum</h3>
-            </div>
-            <ul className="space-y-3.5">
-              {before.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-aruna-textSecondary">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-aruna-error" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Card>
-          <Card className="border-aruna-secondary/40 bg-aruna-light1/40 p-7">
-            <div className="mb-5 flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-aruna-success" />
-              <h3 className="font-display text-lg font-semibold text-aruna-text">Setelah FISH</h3>
-            </div>
-            <ul className="space-y-3.5">
-              {after.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-aruna-text">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-aruna-success" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Card>
+          <Reveal from="right">
+            <Card className="h-full border-aruna-border p-7">
+              <div className="mb-5 flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-aruna-error" />
+                <h3 className="font-display text-lg font-semibold text-aruna-text">Sebelum</h3>
+              </div>
+              <ul className="space-y-3.5">
+                {before.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-aruna-textSecondary">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-aruna-error" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </Reveal>
+          <Reveal from="left" delay={0.08}>
+            <Card className="gradient-border h-full bg-aruna-light1/40 p-7">
+              <div className="mb-5 flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-aruna-success" />
+                <h3 className="font-display text-lg font-semibold text-aruna-text">Setelah FISH</h3>
+              </div>
+              <ul className="space-y-3.5">
+                {after.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-aruna-text">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-aruna-success" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </Reveal>
         </div>
       </section>
 
       {/* CAPABILITIES */}
       <section className="border-y border-aruna-border bg-white py-20">
         <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-aruna-secondary">
-              Kapabilitas Utama
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-aruna-text">
-              Satu Sistem, Sepuluh Kapabilitas Operasional
-            </h2>
-          </div>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <SectionHeading eyebrow="Kapabilitas Utama" title="Satu Sistem, Sepuluh Kapabilitas Operasional" />
+          <Stagger gap={0.05} className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {capabilities.map((c) => (
-              <Card key={c.title} className="p-5 transition-shadow hover:shadow-soft">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary">
-                  <c.icon className="h-4.5 w-4.5" />
-                </div>
-                <h3 className="mt-3 text-sm font-semibold text-aruna-text">{c.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-aruna-textSecondary">{c.desc}</p>
-              </Card>
+              <StaggerItem key={c.title} className="h-full">
+                <Card interactive className="group h-full p-5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-aruna-light1 text-aruna-primary transition-colors group-hover:bg-aruna-gradient group-hover:text-white">
+                    <c.icon className="h-4.5 w-4.5" />
+                  </div>
+                  <h3 className="mt-3 text-sm font-semibold text-aruna-text">{c.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-aruna-textSecondary">{c.desc}</p>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </div>
       </section>
 
       {/* DASHBOARD PREVIEW */}
       <section className="container py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-aruna-secondary">
-            Smart Operations Dashboard
-          </p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-aruna-text">
-            Lihat Sekilas Dashboard yang Akan Anda Gunakan
-          </h2>
-          <p className="mt-4 text-aruna-textSecondary">
-            KPI, rekomendasi, dan monitoring operasional dalam satu tampilan yang terpadu.
-          </p>
-        </div>
+        <SectionHeading
+          eyebrow="Smart Operations Dashboard"
+          title="Lihat Sekilas Dashboard yang Akan Anda Gunakan"
+          description="KPI, rekomendasi, dan monitoring operasional dalam satu tampilan yang terpadu."
+        />
 
-        <Card className="mx-auto mt-12 max-w-6xl overflow-hidden p-0 shadow-soft">
-          {/* fake browser chrome */}
-          <div className="flex items-center gap-2 border-b border-aruna-border bg-aruna-bg px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-aruna-error/60" />
-            <span className="h-2.5 w-2.5 rounded-full bg-aruna-warning/60" />
-            <span className="h-2.5 w-2.5 rounded-full bg-aruna-success/60" />
-            <span className="ml-3 rounded-md bg-white px-3 py-1 text-xs text-aruna-textSecondary shadow-sm">
-              aruna-fish.app/app/overview
-            </span>
-          </div>
+        <Reveal delay={0.1} distance={28} className="relative mx-auto mt-12 max-w-6xl">
+          <div className="pointer-events-none absolute -inset-6 rounded-[32px] bg-gradient-to-b from-aruna-light2/70 to-transparent blur-2xl" />
+          <Card className="relative overflow-hidden p-0 shadow-elevated">
+            {/* fake browser chrome */}
+            <div className="flex items-center gap-2 border-b border-aruna-border bg-aruna-bg px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-aruna-error/60" />
+              <span className="h-2.5 w-2.5 rounded-full bg-aruna-warning/60" />
+              <span className="h-2.5 w-2.5 rounded-full bg-aruna-success/60" />
+              <span className="ml-3 rounded-md bg-white px-3 py-1 text-xs text-aruna-textSecondary shadow-sm">
+                aruna-fish.app/app/overview
+              </span>
+            </div>
 
-          <div className="grid gap-0 lg:grid-cols-[220px_1fr]">
-            {/* sidebar sliver */}
-            <div className="hidden border-r border-aruna-border bg-white p-4 lg:block">
-              <div className="mb-6 flex items-center gap-2 text-aruna-primary">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg aruna-gradient text-white">
-                  <Fish className="h-4 w-4" />
+            <div className="grid gap-0 lg:grid-cols-[220px_1fr]">
+              {/* sidebar sliver */}
+              <div className="hidden bg-aruna-dark p-4 lg:block">
+                <div className="mb-6 flex items-center gap-2 text-white">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg aruna-gradient text-white">
+                    <Fish className="h-4 w-4" />
+                  </div>
+                  <span className="font-display text-sm font-bold">Aruna FISH</span>
                 </div>
-                <span className="font-display text-sm font-bold">Aruna FISH</span>
-              </div>
-              <div className="space-y-1">
-                {["Overview", "Supply Intake", "Factory Energy", "Value Optimization", "Production Plan"].map(
-                  (item, i) => (
+                <div className="space-y-1">
+                  {["Overview", "Supply Intake", "Factory Energy", "Value Optimization", "Production Plan"].map((item, i) => (
                     <div
                       key={item}
                       className={`rounded-md px-3 py-2 text-xs font-medium ${
-                        i === 0
-                          ? "bg-aruna-light1 text-aruna-primary"
-                          : "text-aruna-textSecondary"
+                        i === 0 ? "bg-white/10 text-white" : "text-white/60"
                       }`}
                     >
                       {item}
                     </div>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* main content */}
-            <div className="bg-aruna-bg p-6">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <KPICard
-                  label="Profit Hari Ini"
-                  value={formatRupiahJuta(244.2)}
-                  icon={TrendingUp}
-                  deltaLabel="+12,7%"
-                  deltaDirection="up"
-                  deltaTone="positive"
-                  helperText="vs kemarin"
-                />
-                <KPICard
-                  label="Efisiensi Energi"
-                  value={formatPercent(84.3)}
-                  icon={Zap}
-                  deltaLabel="+3,1%"
-                  deltaDirection="up"
-                  deltaTone="positive"
-                  helperText="rata-rata plant"
-                />
-                <KPICard
-                  label="Utilisasi Kapasitas"
-                  value={formatPercent(91.6)}
-                  icon={Gauge}
-                  deltaLabel="-1,4%"
-                  deltaDirection="down"
-                  deltaTone="negative"
-                  helperText="vs target"
-                />
+                  ))}
+                </div>
               </div>
 
-              <div className="mt-4 grid gap-4 lg:grid-cols-3">
-                <div className="rounded-xl border border-aruna-border bg-white p-4 lg:col-span-2">
-                  <p className="text-sm font-semibold text-aruna-text">Tren Profit Mingguan</p>
-                  <p className="text-xs text-aruna-textSecondary">Ilustratif, dalam Rp juta</p>
-                  <div className="mt-3 h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={dashboardTrend}>
-                        <defs>
-                          <linearGradient id="homeProfit" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS[0]} stopOpacity={0.35} />
-                            <stop offset="100%" stopColor={CHART_COLORS[0]} stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid stroke={CHART_GRID_COLOR} vertical={false} />
-                        <XAxis dataKey="day" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} width={30} />
-                        <Tooltip {...chartTooltipStyle} />
-                        <Area type="monotone" dataKey="profit" stroke={CHART_COLORS[0]} fill="url(#homeProfit)" strokeWidth={2} />
-                      </AreaChart>
-                    </ResponsiveContainer>
+              {/* main content */}
+              <div className="bg-aruna-bg p-6">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <KPICard
+                    label="Profit Hari Ini"
+                    value={formatRupiahJuta(244.2)}
+                    icon={TrendingUp}
+                    deltaLabel="+12,7%"
+                    deltaDirection="up"
+                    deltaTone="positive"
+                    helperText="vs kemarin"
+                    sparkline={[182, 196, 174, 214, 231, 219, 244]}
+                  />
+                  <KPICard
+                    label="Efisiensi Energi"
+                    value={formatPercent(84.3)}
+                    icon={Zap}
+                    deltaLabel="+3,1%"
+                    deltaDirection="up"
+                    deltaTone="positive"
+                    helperText="rata-rata plant"
+                    accent="success"
+                    sparkline={[79, 80, 81, 80, 82, 83, 84.3]}
+                  />
+                  <KPICard
+                    label="Utilisasi Kapasitas"
+                    value={formatPercent(91.6)}
+                    icon={Gauge}
+                    deltaLabel="-1,4%"
+                    deltaDirection="down"
+                    deltaTone="negative"
+                    helperText="vs target"
+                    accent="warning"
+                    sparkline={[94, 93, 93.5, 92, 92.4, 91.9, 91.6]}
+                  />
+                </div>
+
+                <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                  <div className="rounded-xl border border-aruna-border bg-white p-4 lg:col-span-2">
+                    <p className="text-sm font-semibold text-aruna-text">Tren Profit Mingguan</p>
+                    <p className="text-xs text-aruna-textSecondary">Ilustratif, dalam Rp juta</p>
+                    <div className="mt-3 h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={dashboardTrend}>
+                          <defs>
+                            <linearGradient id="homeProfit" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={CHART_COLORS[0]} stopOpacity={0.35} />
+                              <stop offset="100%" stopColor={CHART_COLORS[0]} stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid stroke={CHART_GRID_COLOR} vertical={false} />
+                          <XAxis dataKey="day" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} width={30} />
+                          <Tooltip {...chartTooltipStyle} />
+                          <Area type="monotone" dataKey="profit" stroke={CHART_COLORS[0]} fill="url(#homeProfit)" strokeWidth={2} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-aruna-border bg-white p-4">
+                    <p className="text-sm font-semibold text-aruna-text">Production Mix</p>
+                    <p className="text-xs text-aruna-textSecondary">Rekomendasi optimizer</p>
+                    <div className="mt-3 h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={mixPreview} layout="vertical" margin={{ left: 8 }}>
+                          <XAxis type="number" hide />
+                          <YAxis
+                            type="category"
+                            dataKey="sku"
+                            tick={{ fontSize: 10, fill: CHART_AXIS_COLOR }}
+                            axisLine={false}
+                            tickLine={false}
+                            width={62}
+                          />
+                          <Tooltip {...chartTooltipStyle} />
+                          <Bar dataKey="value" fill={CHART_COLORS[1]} radius={[0, 4, 4, 0]} barSize={14} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
-                <div className="rounded-xl border border-aruna-border bg-white p-4">
-                  <p className="text-sm font-semibold text-aruna-text">Production Mix</p>
-                  <p className="text-xs text-aruna-textSecondary">Rekomendasi optimizer</p>
-                  <div className="mt-3 h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={mixPreview} layout="vertical" margin={{ left: 8 }}>
-                        <XAxis type="number" hide />
-                        <YAxis
-                          type="category"
-                          dataKey="sku"
-                          tick={{ fontSize: 10, fill: CHART_AXIS_COLOR }}
-                          axisLine={false}
-                          tickLine={false}
-                          width={62}
-                        />
-                        <Tooltip {...chartTooltipStyle} />
-                        <Bar dataKey="value" fill={CHART_COLORS[1]} radius={[0, 4, 4, 0]} barSize={14} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
 
-              <div className="mt-4 rounded-xl border border-aruna-border bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-aruna-text">Utilisasi Cold Storage</p>
-                  <Badge variant="success">Aman</Badge>
+                <div className="mt-4 rounded-xl border border-aruna-border bg-white p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-aruna-text">Utilisasi Cold Storage</p>
+                    <Badge variant="success">Aman</Badge>
+                  </div>
+                  <Progress value={68} className="mt-3" />
+                  <p className="mt-2 text-xs text-aruna-textSecondary">
+                    {formatKg(12920)} dari {formatKg(19000)} kapasitas terpakai
+                  </p>
                 </div>
-                <Progress value={68} className="mt-3" />
-                <p className="mt-2 text-xs text-aruna-textSecondary">
-                  {formatKg(12920)} dari {formatKg(19000)} kapasitas terpakai
-                </p>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </Reveal>
       </section>
 
       {/* CTA */}
       <section className="container">
-        <div className="aruna-gradient overflow-hidden rounded-2xl px-8 py-16 text-center sm:px-16">
-          <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Siap Mengubah Data Operasional Menjadi Keputusan yang Lebih Bernilai?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-white/85">
-            Masuk ke Smart Operations Dashboard dan rasakan bagaimana FISH mengoptimalkan setiap
-            keputusan produksi Aruna.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" className="bg-white text-aruna-primary hover:bg-white/90">
-              <Link to="/app/overview">
-                Masuk ke Dashboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-white/40 bg-transparent text-white hover:bg-white/10">
-              <Link to="/cara-kerja">Lihat Cara Kerja</Link>
-            </Button>
+        <Reveal>
+          <div className="relative overflow-hidden rounded-2xl aruna-gradient px-8 py-16 text-center shadow-elevated sm:px-16">
+            <div className="pointer-events-none absolute inset-0 dot-grid-light opacity-70" />
+            <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative">
+              <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+                Siap Mengubah Data Operasional Menjadi Keputusan yang Lebih Bernilai?
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-white/85">
+                Masuk ke Smart Operations Dashboard dan rasakan bagaimana FISH mengoptimalkan setiap
+                keputusan produksi Aruna.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Button asChild size="lg" className="bg-white text-aruna-primary shadow-lg hover:bg-white/90 hover:shadow-xl">
+                  <Link to="/app/overview">
+                    Masuk ke Dashboard
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10">
+                  <Link to="/cara-kerja">Lihat Cara Kerja</Link>
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
     </div>
   );

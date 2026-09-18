@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Home, Settings, LogOut, UserCircle } from "lucide-react";
-import { currentUser } from "@/data/roles";
+import { currentUser, roleDefinitions } from "@/data/roles";
+import { useAppContext } from "@/context/AppContext";
 
 export function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { role } = useAppContext();
+  const roleDef = roleDefinitions.find((r) => r.name === role);
 
   function handleLogout() {
     setOpen(false);
@@ -18,23 +21,27 @@ export function ProfileMenu() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        title={`${currentUser.name} · ${currentUser.role}`}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-aruna-primary text-xs font-semibold text-white transition-opacity hover:opacity-90"
+        title={`${currentUser.name} · ${role}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="relative flex h-9 w-9 items-center justify-center rounded-full aruna-gradient text-xs font-semibold text-white shadow-sm ring-2 ring-white transition-shadow hover:shadow-glow"
       >
         {currentUser.avatarInitials}
+        <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-aruna-success" />
       </button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-60 rounded-xl border border-aruna-border bg-white p-1.5 shadow-soft animate-fade-in">
-            <div className="flex items-center gap-2.5 px-2.5 py-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-aruna-primary text-xs font-semibold text-white">
+          <div role="menu" className="absolute right-0 z-50 mt-2 w-64 rounded-xl border border-aruna-border bg-white p-1.5 shadow-elevated animate-scale-in">
+            <div className="flex items-center gap-2.5 rounded-lg bg-aruna-bg px-2.5 py-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full aruna-gradient text-xs font-semibold text-white">
                 {currentUser.avatarInitials}
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-aruna-text">{currentUser.name}</p>
-                <p className="truncate text-xs text-aruna-textSecondary">{currentUser.role}</p>
+                <p className="truncate text-xs text-aruna-textSecondary">{role}</p>
+                {roleDef && <p className="truncate text-[10px] text-aruna-textSecondary/80">{currentUser.plant}</p>}
               </div>
             </div>
             <div className="my-1 border-t border-aruna-border" />
