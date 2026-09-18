@@ -39,6 +39,18 @@ import Approvals from "@/pages/dashboard/Approvals";
 import Settings from "@/pages/dashboard/Settings";
 import Help from "@/pages/dashboard/Help";
 
+// Aruna ERP (Extended Dashboard)
+import ErpLayout from "@/erp/components/ErpLayout";
+import ErpHome from "@/erp/pages/ErpHome";
+import ErpFinance from "@/erp/pages/Finance";
+import ErpProcurement from "@/erp/pages/Procurement";
+import ErpInventory from "@/erp/pages/Inventory";
+import ErpOperations from "@/erp/pages/Operations";
+import ErpSales from "@/erp/pages/Sales";
+import ErpHR from "@/erp/pages/HR";
+import ErpApprovals from "@/erp/pages/Approvals";
+import ErpIntegrations from "@/erp/pages/Integrations";
+
 function App() {
   return (
     <BrowserRouter>
@@ -78,6 +90,18 @@ function App() {
           <Route path="approvals" element={<Approvals />} />
           <Route path="settings" element={<Settings />} />
           <Route path="help" element={<Help />} />
+        </Route>
+
+        <Route path="/erp" element={<ErpLayout />}>
+          <Route index element={<ErpHome />} />
+          <Route path="finance" element={<ErpFinance />} />
+          <Route path="procurement" element={<ErpProcurement />} />
+          <Route path="inventory" element={<ErpInventory />} />
+          <Route path="operations" element={<ErpOperations />} />
+          <Route path="sales" element={<ErpSales />} />
+          <Route path="hr" element={<ErpHR />} />
+          <Route path="approvals" element={<ErpApprovals />} />
+          <Route path="integrations" element={<ErpIntegrations />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

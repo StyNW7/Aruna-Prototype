@@ -50,12 +50,33 @@ Seluruh fitur berikut telah diverifikasi berfungsi penuh (bukan placeholder):
 - **Reports — filter & riwayat** — filter kategori (Produksi/Energi/Finansial/Logistik/Manajemen), pencarian laporan, validasi periode kustom, riwayat export per sesi, tombol **Cetak** yang membuka jendela cetak khusus laporan (tanpa sidebar/header), dan deep-link `/app/reports?preview=<nama>` dari pencarian global.
 - **Role switching yang benar-benar personal** — beralih tampilan antar 6 role (Plant Manager, Production Planner, Finance, Engineering, Quality Control, Commercial) dari halaman Login (kredensial demo terisi otomatis) maupun header dashboard. Role aktif mengubah sapaan & "Fokus untuk role" di Overview, penanda ★ modul fokus di sidebar, serta menu profil; tersimpan lewat `localStorage`.
 - **Global Search (Ctrl/⌘ + K)** — mencari modul, SKU, batch, vessel, shipment, dan seluruh laporan; navigasi keyboard (↑ ↓ Enter Esc), pencarian terakhir tersimpan, dan modul populer saat kosong.
+- **Aruna ERP (Extended Dashboard)** — modul lintas tim (Finance, Procurement, Warehouse, Operations, Sales, HR, Approval, Integrasi) dengan state terpusat yang saling terhubung; lihat bagian [Aruna ERP](#aruna-erp--extended-dashboard-erp).
 - **Notifikasi & Profile Menu** — badge jumlah belum dibaca, filter "Belum dibaca", tandai dibaca per item maupun massal, dan menu profil yang mengikuti role aktif.
 - **Production Optimizer & Scenario Simulator** — kalkulasi alokasi produksi dan simulasi skenario "what-if" berbasis data supply/SKU aktual.
 - **Approval Center & SOP** — alur approval dengan status dan aturan keputusan yang terdokumentasi.
 - **Insight (artikel publik)** — 6 artikel/studi kasus dengan konten lengkap yang bisa dibuka penuh lewat modal, bukan sekadar teaser.
 - **Kontak & Help** — tautan `mailto:`/`tel:` yang benar-benar aktif, bukan teks statis.
 - Modul operasional lain yang sepenuhnya interaktif: Supply Intake, Inventory, Traceability, Factory Energy, Value Optimization, Pricing Advisor, Production Plan, Shipment Planner, Excess & Side Product, Quality Control, Plan vs Actual (Performance), Settings.
+
+## Aruna ERP — Extended Dashboard (`/erp/*`)
+
+Dari FISH Operations, menu **Extended → Aruna ERP** (juga App Switcher ⊞ di header dan kartu di Overview) membuka dashboard lanjutan bergaya ERP tempat **seluruh tim Aruna bekerja di atas satu basis data**. State disimpan di `localStorage` (`aruna_erp_state_v1`) sehingga transaksi bertahan antar reload; tombol *Reset data demo* mengembalikan seed.
+
+| Modul | Tim | Fitur yang benar-benar berjalan |
+|---|---|---|
+| Beranda ERP | Semua | KPI kas/AR/AP/persediaan/WO/kehadiran, alur integrasi 5 tim, kartu tim, "Perlu Tindakan", feed aktivitas, realisasi anggaran |
+| Finance | Finance | Arus kas, aging piutang, tabel AR & AP (cari/filter, pengingat, terima/bayar), jurnal umum otomatis (double-entry), anggaran vs realisasi |
+| Procurement | Procurement | Buat PO multi-baris, alur Draft → Menunggu Approval → Disetujui → Diterima, detail PO, kartu supplier |
+| Warehouse | Warehouse | Level stok min/max, item kritis, penyesuaian stok (mutasi tercatat), riwayat mutasi ber-referensi PO/WO/SO, komposisi nilai |
+| Operations | Operations & Engineering | Papan kanban work order (mulai → konsumsi loin, selesai → FG masuk), WO baru dengan hitung kebutuhan loin dari yield SKU, tiket maintenance, roster shift |
+| Sales | Sales | Pipeline 5 tahap, quotation multi-SKU dengan validasi credit limit, konfirmasi → kirim (validasi stok FG) → tagih (invoice AR) → lunas, customer & eksposur kredit |
+| HR & People | HR | Direktori per tim, ubah status kehadiran, pengajuan & persetujuan cuti, headcount chart |
+| Approval Center | Lintas tim | Satu antrean PO/cuti/quotation dengan setujui/tolak (+ setujui semua) dan riwayat keputusan |
+| Peta Integrasi | — | Alur peristiwa antar tim, koneksi ke modul FISH, dan tombol **Simulasi End-to-End** (PO → gudang → produksi → penjualan → kas) |
+
+Contoh rantai integrasi: *Terima PO* di Procurement ⇒ stok Warehouse naik, hutang AP & jurnal di Finance dibuat, aktivitas tercatat. *Selesaikan WO* ⇒ stok finished goods naik. *Kirim SO* ⇒ stok FG turun & HPP dijurnal; *Tagih* ⇒ invoice AR sesuai termin customer; *Terima pembayaran* ⇒ kas bertambah & SO lunas.
+
+Struktur kode: `frontend/src/erp/` — `types.ts`, `seed.ts` (data), `ErpContext.tsx` (reducer + aksi terintegrasi), `config.ts` (meta tim & navigasi), `components/` (layout, app switcher, shared), `pages/`.
 
 ## Visual System
 

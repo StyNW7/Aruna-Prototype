@@ -27,6 +27,27 @@ const STATUS_VARIANT: Record<string, "default" | "primary" | "success" | "warnin
   Negosiasikan: "warning",
   "Produksi Selektif": "primary",
   Tolak: "error",
+  // Status Aruna ERP
+  "Menunggu Approval": "warning",
+  Berjalan: "primary",
+  Quotation: "neutral",
+  Dikonfirmasi: "primary",
+  Ditagih: "warning",
+  Lunas: "success",
+  Dibatalkan: "error",
+  "Belum Jatuh Tempo": "outline",
+  "Jatuh Tempo": "warning",
+  Terlambat: "error",
+  Hadir: "success",
+  Cuti: "primary",
+  Sakit: "error",
+  Izin: "warning",
+  "Belum Absen": "neutral",
+  Terbuka: "warning",
+  Dikerjakan: "primary",
+  Rendah: "neutral",
+  Sedang: "warning",
+  Tinggi: "error",
 };
 
 export function StatusBadge({ status }: { status: string }) {

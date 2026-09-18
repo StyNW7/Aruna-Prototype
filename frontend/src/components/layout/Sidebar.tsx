@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Waves, PanelLeftClose, PanelLeftOpen, LogOut, X, Home, Star } from "lucide-react";
+import { Waves, PanelLeftClose, PanelLeftOpen, LogOut, X, Home, Star, ArrowUpRight } from "lucide-react";
 import { navGroups } from "./nav-config";
 import { useAppContext } from "@/context/AppContext";
 import { currentUser, roleDefinitions } from "@/data/roles";
@@ -67,7 +67,8 @@ function SidebarInner({ collapsed, onNavigate }: { collapsed: boolean; onNavigat
                         collapsed && "justify-center",
                         isActive
                           ? "bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                          : "text-white/70 hover:bg-white/5 hover:text-white"
+                          : "text-white/70 hover:bg-white/5 hover:text-white",
+                        item.external && !collapsed && "border border-dashed border-aruna-medium/40 bg-aruna-medium/10 text-white hover:bg-aruna-medium/20"
                       )
                     }
                   >
@@ -86,6 +87,10 @@ function SidebarInner({ collapsed, onNavigate }: { collapsed: boolean; onNavigat
                           )}
                         />
                         {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
+                        {!collapsed && item.badge && (
+                          <span className="rounded-full bg-aruna-medium/25 px-1.5 py-0.5 text-[10px] font-semibold text-aruna-medium">{item.badge}</span>
+                        )}
+                        {!collapsed && item.external && <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-white/50" />}
                         {!collapsed && isFocus && (
                           <Star
                             className="h-3 w-3 shrink-0 fill-aruna-medium text-aruna-medium"

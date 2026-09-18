@@ -21,6 +21,11 @@ import {
   Star,
   ArrowRight,
   CalendarDays,
+  Boxes,
+  Landmark,
+  ShoppingCart,
+  Users,
+  Sparkles,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -384,6 +389,45 @@ export default function Overview() {
           </div>
         </ChartCard>
       </div>
+
+      {/* Extended: Aruna ERP */}
+      <Link to="/erp" className="group mb-6 block">
+        <div className="relative overflow-hidden rounded-2xl bg-slate-900 p-6 text-white shadow-elevated transition-transform hover:-translate-y-0.5 sm:p-7">
+          <div className="pointer-events-none absolute inset-0 line-grid-light opacity-40" />
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-aruna-secondary/30 blur-3xl" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                <Boxes className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/80">
+                  <Sparkles className="h-3 w-3 text-aruna-medium" /> Extended Dashboard
+                </p>
+                <h3 className="mt-2 font-display text-xl font-bold">Aruna ERP — seluruh tim dalam satu sistem</h3>
+                <p className="mt-1 max-w-xl text-sm text-white/75">
+                  Finance, Procurement, Warehouse, Operations, Sales, dan HR berbagi data yang sama dengan FISH: PO → stok → work order → penjualan → jurnal.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { icon: Landmark, label: "Finance" },
+                { icon: ShoppingCart, label: "Procurement" },
+                { icon: Warehouse, label: "Warehouse" },
+                { icon: Users, label: "HR" },
+              ].map((m) => (
+                <span key={m.label} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-xs">
+                  <m.icon className="h-3.5 w-3.5" /> {m.label}
+                </span>
+              ))}
+              <span className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-md transition-transform group-hover:translate-x-0.5">
+                Buka ERP <ArrowRight className="h-4 w-4" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
 
       {/* Alerts + quick actions */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

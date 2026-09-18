@@ -1,9 +1,14 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
+interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+  /** Kelas tambahan untuk pembungkus scroll (mis. hilangkan border saat di dalam Card) */
+  wrapperClassName?: string;
+}
+
+export function Table({ className, wrapperClassName, ...props }: TableProps) {
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-aruna-border">
+    <div className={cn("w-full overflow-x-auto rounded-lg border border-aruna-border", wrapperClassName)}>
       <table className={cn("w-full min-w-[640px] border-collapse text-sm", className)} {...props} />
     </div>
   );

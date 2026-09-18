@@ -18,6 +18,7 @@ import {
   CheckSquare,
   Settings,
   HelpCircle,
+  Boxes as ErpIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,6 +26,10 @@ export interface NavItem {
   label: string;
   href: string;
   icon: LucideIcon;
+  /** Label kecil di samping item (mis. "ERP") */
+  badge?: string;
+  /** Item menuju aplikasi lain (ditampilkan dengan gaya khusus) */
+  external?: boolean;
 }
 
 export interface NavGroup {
@@ -77,6 +82,10 @@ export const navGroups: NavGroup[] = [
       { label: "SOP & Decision Rules", href: "/app/sop", icon: ClipboardCheck },
       { label: "Approval Center", href: "/app/approvals", icon: CheckSquare },
     ],
+  },
+  {
+    label: "Extended",
+    items: [{ label: "Aruna ERP", href: "/erp", icon: ErpIcon, badge: "Baru", external: true }],
   },
   {
     label: "System",

@@ -6,6 +6,7 @@ import { supplyBatches } from "@/data/supply";
 import { shipments } from "@/data/shipment";
 import { navGroups } from "./nav-config";
 import { REPORT_DEFINITIONS } from "@/utils/reportData";
+import { ERP_NAV } from "@/erp/config";
 import { cn } from "@/lib/utils";
 
 interface SearchResult {
@@ -14,7 +15,7 @@ interface SearchResult {
   sublabel: string;
   href: string;
   icon: LucideIcon;
-  group: "Modul" | "SKU" | "Batch" | "Shipment" | "Report";
+  group: "Modul" | "ERP" | "SKU" | "Batch" | "Shipment" | "Report";
 }
 
 const RECENT_KEY = "aruna_recent_search";
@@ -30,6 +31,15 @@ const moduleIndex: SearchResult[] = navGroups.flatMap((g) =>
     group: "Modul" as const,
   }))
 );
+
+const erpIndex: SearchResult[] = ERP_NAV.map((i) => ({
+  id: i.href,
+  label: `${i.label} (ERP)`,
+  sublabel: `Aruna ERP · ${i.description}`,
+  href: i.href,
+  icon: i.icon,
+  group: "ERP" as const,
+}));
 
 function readRecent(): string[] {
   try {
@@ -52,6 +62,7 @@ export function GlobalSearch() {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     const moduleResults = moduleIndex.filter((m) => m.label.toLowerCase().includes(q) || m.sublabel.toLowerCase().includes(q));
+    const erpResults = erpIndex.filter((m) => m.label.toLowerCase().includes(q) || m.sublabel.toLowerCase().includes(q));
     const skuResults: SearchResult[] = skus
       .filter((s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q) || s.category.toLowerCase().includes(q))
       .map((s) => ({ id: s.code, label: s.name, sublabel: `SKU · ${s.category}`, href: "/app/value", icon: Fish, group: "SKU" }));
@@ -64,7 +75,7 @@ export function GlobalSearch() {
     const reportResults: SearchResult[] = REPORT_DEFINITIONS.filter((r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q)).map(
       (r) => ({ id: r.name, label: r.name, sublabel: "Report · Preview / PDF / CSV", href: `/app/reports?preview=${encodeURIComponent(r.name)}`, icon: FileText, group: "Report" })
     );
-    return [...moduleResults, ...skuResults, ...batchResults, ...shipmentResults, ...reportResults].slice(0, MAX_RESULTS);
+    return [...moduleResults, ...erpResults, ...skuResults, ...batchResults, ...shipmentResults, ...reportResults].slice(0, MAX_RESULTS);
   }, [query]);
 
   const close = useCallback(() => {
@@ -154,7 +165,7 @@ export function GlobalSearch() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={onInputKey}
-                placeholder="Cari modul, SKU, batch, vessel, shipment, atau report..."
+                placeholder="Cari modul FISH/ERP, SKU, batch, vessel, shipment, atau report..."
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-aruna-textSecondary/60"
                 aria-activedescendant={results[active] ? `search-opt-${active}` : undefined}
               />

@@ -7,6 +7,7 @@ import { NotificationDrawer } from "./NotificationDrawer";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { ProfileMenu } from "./ProfileMenu";
 import { useAppContext } from "@/context/AppContext";
+import { AppSwitcher } from "@/erp/components/AppSwitcher";
 
 const allItems = navGroups.flatMap((g) => g.items);
 
@@ -47,10 +48,10 @@ export function DashboardHeader() {
               FISH Operations
             </Link>
             {group && (
-              <>
+              <span className="hidden items-center gap-1.5 2xl:flex">
                 <span className="text-aruna-border">/</span>
                 <span>{group.label}</span>
-              </>
+              </span>
             )}
             <span className="text-aruna-border">/</span>
             <span className="font-medium text-aruna-text">{current?.label ?? "Dashboard"}</span>
@@ -79,6 +80,7 @@ export function DashboardHeader() {
           </div>
         </div>
         <GlobalSearch />
+        <AppSwitcher current="fish" />
         <NotificationDrawer />
         <RoleSwitcher />
         <ProfileMenu />
