@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Plus, Handshake, TrendingUp, Globe2, Receipt, Check, Truck, FileText, X, Trash2, UserPlus, Eye } from "lucide-react";
+import { Plus, Handshake, TrendingUp, Globe2, Receipt, Check, Truck, FileText, X, Trash2, UserPlus, Eye, FileDown } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { KPICard } from "@/components/cards/KPICard";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,9 @@ import { skus } from "@/data/skus";
 import { useErp, fmtUsd, fmtRpShort } from "../ErpContext";
 import { KURS_USD } from "../seed";
 import { ErpPageHeader, SectionCard, Field, fmtDate } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { buildErpReport } from "../reports";
+import { exportSalesOrderPdf } from "../export";
 import type { Customer, SalesOrder, SalesOrderLine } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -112,6 +115,7 @@ export default function Sales() {
         subtitle="Quotation → konfirmasi → pengiriman (stok Warehouse) → invoice (piutang Finance) → lunas. Credit limit customer divalidasi otomatis."
         actions={
           <>
+            <ExportMenu label="Export" size="default" getDoc={() => buildErpReport("sales", state, "Bulan berjalan")} />
             <Button variant="outline" onClick={() => setOpenCus(true)}>
               <UserPlus className="h-4 w-4" /> Customer Baru
             </Button>
@@ -391,6 +395,7 @@ export default function Sales() {
                 })}
               </div>
               <DialogFooter>
+                <Button variant="outline" onClick={() => { exportSalesOrderPdf(detail, state, skuName); toast.success(`${detail.id}.pdf diunduh.`); }}><FileDown className="h-4 w-4" /> PDF {detail.status === "Quotation" ? "Quotation" : "SO"}</Button>
                 {detail.status === "Quotation" && <Button onClick={() => act(detail, "confirm")}><Check className="h-4 w-4" /> Konfirmasi</Button>}
                 {detail.status === "Dikonfirmasi" && <Button onClick={() => act(detail, "ship")}><Truck className="h-4 w-4" /> Kirim</Button>}
                 {detail.status === "Dikirim" && <Button onClick={() => act(detail, "invoice")}><FileText className="h-4 w-4" /> Terbitkan Invoice</Button>}

@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import {
   Anchor,
   Users,
@@ -14,9 +13,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { formatKg, formatPercent } from "@/utils/format";
 import { PageHero } from "@/components/public/PageHero";
+import { CtaBanner } from "@/components/public/CtaBanner";
 
 const valueChain = [
   { icon: Anchor, title: "Nelayan", desc: "Nelayan skala kecil di sekitar Teluk Bungus dan pesisir Sumatera Barat menangkap dan menyalurkan hasil laut segar." },
@@ -194,18 +193,13 @@ export default function About() {
 
       {/* CTA */}
       <section className="container">
-        <Card className="flex flex-col items-center gap-4 border-aruna-border bg-aruna-light1/50 p-10 text-center">
-          <Sparkles className="h-6 w-6 text-aruna-primary" />
-          <h2 className="font-display text-2xl font-bold text-aruna-text">
-            Ingin tahu bagaimana FISH mengubah cara Aruna beroperasi?
-          </h2>
-          <Button asChild variant="gradient" size="lg">
-            <Link to="/fish-framework">
-              Jelajahi FISH Framework
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </Card>
+        <CtaBanner
+          icon={Sparkles}
+          title="Ingin tahu bagaimana FISH mengubah cara Aruna beroperasi?"
+          description="Empat pilar yang mengubah produksi PO-driven menjadi resource-driven value optimization."
+          primary={{ label: "Jelajahi FISH Framework", to: "/fish-framework" }}
+          secondary={{ label: "Masuk ke Dashboard", to: "/app/overview" }}
+        />
       </section>
     </div>
   );

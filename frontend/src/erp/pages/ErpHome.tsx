@@ -13,7 +13,7 @@ import {
   Sparkles,
   Waves,
 } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ComposedChart, Area, Line, Legend } from "recharts";
 import { KPICard } from "@/components/cards/KPICard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,12 @@ import { useErp, fmtRpShort, fmtUsd, effectiveInvoiceStatus } from "../ErpContex
 import { TEAM_META, ERP_NAV } from "../config";
 import type { ErpTeam } from "../types";
 import { ActivityFeed, SectionCard, TeamChip } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { ReportPreview } from "../components/ReportPreview";
+import { buildErpReport, ERP_REPORTS } from "../reports";
+import type { ExportDoc } from "../export";
+import { useState } from "react";
+import { FileBarChart2, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FLOW: { team: ErpTeam; href: string }[] = [
@@ -33,8 +39,20 @@ const FLOW: { team: ErpTeam; href: string }[] = [
   { team: "Finance", href: "/erp/finance" },
 ];
 
+const TREND = [
+  { bulan: "Apr", penjualan: 2.41, hpp: 1.62, margin: 0.79 },
+  { bulan: "Mei", penjualan: 2.63, hpp: 1.74, margin: 0.89 },
+  { bulan: "Jun", penjualan: 2.35, hpp: 1.6, margin: 0.75 },
+  { bulan: "Jul", penjualan: 2.88, hpp: 1.9, margin: 0.98 },
+  { bulan: "Agu", penjualan: 3.02, hpp: 1.98, margin: 1.04 },
+];
+
+const QUICK_REPORTS = ["finance-summary", "inventory", "sales", "production"];
+
 export default function ErpHome() {
   const { state, derived } = useErp();
+  const [preview, setPreview] = useState<ExportDoc | null>(null);
+  const trend = [...TREND, { bulan: "Sep", penjualan: +((derived.revenueMtdUsd * 16481) / 1e9).toFixed(2), hpp: +((derived.revenueMtdUsd * 16481 * 0.66) / 1e9).toFixed(2), margin: +((derived.revenueMtdUsd * 16481 * 0.34) / 1e9).toFixed(2) }];
 
   const flowStats: Record<string, { value: string; label: string; warn?: boolean }> = {
     Procurement: { value: String(state.purchaseOrders.filter((p) => p.status === "Menunggu Approval").length), label: "PO menunggu approval", warn: state.purchaseOrders.some((p) => p.status === "Menunggu Approval") },
@@ -154,6 +172,51 @@ export default function ErpHome() {
         <KPICard label="Kehadiran Hari Ini" value={`${derived.presentToday}/${state.employees.length}`} icon={Users} accent="success" helperText="karyawan hadir" />
       </div>
 
+      {/* Trend + quick reports */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <SectionCard title="Tren Penjualan, HPP & Margin" description="6 bulan terakhir (Rp miliar) — bulan berjalan dihitung dari sales order live" className="xl:col-span-2">
+          <div className="h-64 px-3 py-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={trend} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="erpSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#016097" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#016097" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={CHART_GRID_COLOR} vertical={false} />
+                <XAxis dataKey="bulan" tick={{ fontSize: 12, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} />
+                <Tooltip {...chartTooltipStyle} formatter={(v: number) => `Rp${v.toFixed(2).replace(".", ",")} M`} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Area type="monotone" dataKey="penjualan" name="Penjualan" stroke="#016097" strokeWidth={2.5} fill="url(#erpSales)" />
+                <Bar dataKey="hpp" name="HPP" fill="#B7DEEC" radius={[6, 6, 0, 0]} barSize={22} />
+                <Line type="monotone" dataKey="margin" name="Margin kotor" stroke="#1E8E5A" strokeWidth={2.5} dot={{ r: 3 }} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </SectionCard>
+        <SectionCard title="Laporan Cepat" description="Preview atau unduh Excel / PDF / CSV" icon={<FileBarChart2 className="mt-0.5 h-4 w-4 text-aruna-primary" />} action={<Link to="/erp/reports" className="text-xs font-medium text-aruna-primary hover:underline">Semua laporan →</Link>}>
+          <ul className="divide-y divide-aruna-border">
+            {QUICK_REPORTS.map((key) => {
+              const r = ERP_REPORTS.find((x) => x.key === key)!;
+              const m = r.team !== "Semua" ? TEAM_META[r.team] : null;
+              return (
+                <li key={key} className="flex items-center gap-3 px-5 py-3">
+                  <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white", m?.solid ?? "bg-slate-900")}>{m ? <m.icon className="h-4 w-4" /> : <FileBarChart2 className="h-4 w-4" />}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-aruna-text">{r.name}</span>
+                    <span className="block truncate text-[11px] text-aruna-textSecondary">{r.description}</span>
+                  </span>
+                  <button onClick={() => setPreview(buildErpReport(key, state, "Bulan berjalan"))} className="flex h-8 w-8 items-center justify-center rounded-lg text-aruna-textSecondary hover:bg-aruna-light1 hover:text-aruna-primary" title="Preview"><Eye className="h-4 w-4" /></button>
+                  <ExportMenu getDoc={() => buildErpReport(key, state, "Bulan berjalan")} label="" />
+                </li>
+              );
+            })}
+          </ul>
+        </SectionCard>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Team cards */}
         <div className="xl:col-span-2">
@@ -263,6 +326,7 @@ export default function ErpHome() {
           ))}
         </div>
       </SectionCard>
+      <ReportPreview doc={preview} onClose={() => setPreview(null)} />
     </div>
   );
 }

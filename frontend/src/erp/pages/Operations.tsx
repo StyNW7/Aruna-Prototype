@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { skus } from "@/data/skus";
 import { useErp } from "../ErpContext";
 import { ErpPageHeader, SectionCard, Field, TeamChip, fmtDate } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { buildErpReport } from "../reports";
 import type { WorkOrder, WorkOrderStatus, MaintenanceTicket } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +99,7 @@ export default function Operations() {
         subtitle="Work order terhubung ke Production Plan FISH; memulai WO mengonsumsi Fresh Loin dan menyelesaikannya menambah stok finished goods."
         actions={
           <>
+            <ExportMenu label="Export" size="default" getDoc={() => buildErpReport("production", state, "Bulan berjalan")} />
             <Button variant="outline" onClick={() => setOpenTicket(true)}>
               <Wrench className="h-4 w-4" />
               Lapor Kerusakan

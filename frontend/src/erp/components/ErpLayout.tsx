@@ -5,6 +5,7 @@ import { Boxes, Menu, X, ArrowLeft, RotateCcw, Bell, Waves, ChevronRight, Sparkl
 import { ErpProvider, useErp } from "../ErpContext";
 import { ERP_NAV, TEAM_META } from "../config";
 import { AppSwitcher } from "./AppSwitcher";
+import { ErpSearch } from "./ErpSearch";
 import { currentUser } from "@/data/roles";
 import { cn } from "@/lib/utils";
 
@@ -35,13 +36,14 @@ function ErpSidebarInner({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
-        <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-aruna-textSecondary">Modul</p>
-        {ERP_NAV.map((item) => {
+        {ERP_NAV.map((item, idx) => {
+          const sectionLabel = idx === 0 ? "Ringkasan" : idx === 1 ? "Modul Tim" : item.href === "/erp/approvals" ? "Lintas Tim" : null;
           const meta = item.team ? TEAM_META[item.team] : null;
           const badge = item.href === "/erp/approvals" && derived.pendingApprovals > 0 ? derived.pendingApprovals : null;
           return (
+            <div key={item.href}>
+              {sectionLabel && <p className={cn("mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-aruna-textSecondary", idx > 0 && "mt-4")}>{sectionLabel}</p>}
             <NavLink
-              key={item.href}
               to={item.href}
               end={item.href === "/erp"}
               onClick={onNavigate}
@@ -70,6 +72,7 @@ function ErpSidebarInner({ onNavigate }: { onNavigate?: () => void }) {
                 </>
               )}
             </NavLink>
+            </div>
           );
         })}
       </nav>
@@ -129,10 +132,11 @@ function ErpHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <span className="hidden items-center gap-1.5 rounded-full border border-aruna-border bg-white px-2.5 py-1 text-[11px] font-medium text-aruna-text lg:inline-flex">
+        <span className="hidden items-center gap-1.5 rounded-full border border-aruna-border bg-white px-2.5 py-1 text-[11px] font-medium text-aruna-text 2xl:inline-flex">
           <span className="live-dot h-1.5 w-1.5 rounded-full bg-aruna-success" />
-          Sinkron dengan FISH · realtime
+          Sinkron dengan FISH
         </span>
+        <ErpSearch />
         <AppSwitcher current="erp" />
         <Link
           to="/erp/approvals"
@@ -180,7 +184,7 @@ function ErpShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <ErpHeader onOpenMobile={() => setMobileOpen(true)} />
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <main className="dashboard-canvas flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <div key={pathname} className="animate-fade-up">
             <Outlet />
           </div>

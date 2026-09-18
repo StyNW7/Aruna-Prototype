@@ -236,3 +236,112 @@
     transform: none;
   }
 }
+
+
+/* ------------------------------------------------------------------ */
+/* Form controls — chevron select, range slider, checkbox              */
+/* ------------------------------------------------------------------ */
+select.aruna-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  padding-right: 2.25rem;
+}
+
+input[type="range"].aruna-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #016097 0%, #358ebd var(--range-pct, 50%), #eaf5fa var(--range-pct, 50%), #eaf5fa 100%);
+  outline: none;
+}
+input[type="range"].aruna-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #016097;
+  box-shadow: 0 2px 6px rgba(1, 96, 151, 0.35);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+input[type="range"].aruna-range::-webkit-slider-thumb:hover,
+input[type="range"].aruna-range:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 5px rgba(53, 142, 189, 0.18), 0 2px 6px rgba(1, 96, 151, 0.35);
+}
+input[type="range"].aruna-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #016097;
+  box-shadow: 0 2px 6px rgba(1, 96, 151, 0.35);
+  cursor: pointer;
+}
+input[type="range"].aruna-range::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #eaf5fa;
+}
+input[type="range"].aruna-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #016097, #358ebd);
+}
+
+input[type="checkbox"].aruna-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.3rem;
+  border: 1.5px solid #cbd5e1;
+  background: #fff;
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+input[type="checkbox"].aruna-check::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  transform: scale(0);
+  transition: transform 120ms ease-in-out;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  background: #fff;
+}
+input[type="checkbox"].aruna-check:checked {
+  background: linear-gradient(135deg, #016097, #358ebd);
+  border-color: #016097;
+}
+input[type="checkbox"].aruna-check:checked::before {
+  transform: scale(1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll-driven reveal untuk halaman publik (progressive enhancement) */
+/* ------------------------------------------------------------------ */
+@supports (animation-timeline: view()) {
+  .public-reveal section:not(:first-child) > .container > * {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 28%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-reveal section > .container > * {
+    animation: none !important;
+  }
+}
+
+/* Dashboard canvas — sapuan gradien halus di bagian atas */
+.dashboard-canvas {
+  background-image: radial-gradient(60% 40% at 50% -10%, rgba(53, 142, 189, 0.1) 0%, transparent 70%);
+}

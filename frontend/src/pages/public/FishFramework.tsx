@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom";
 import {
   Zap,
   Calculator,
   LayoutDashboard,
   BookText,
-  ArrowRight,
   Gauge,
   Sliders,
   DollarSign,
@@ -21,8 +19,8 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/public/PageHero";
+import { CtaBanner } from "@/components/public/CtaBanner";
 
 interface PillarDetail {
   letter: string;
@@ -263,17 +261,14 @@ export default function FishFramework() {
 
       {/* CTA */}
       <section className="container">
-        <Card className="flex flex-col items-center gap-4 border-aruna-border bg-aruna-light1/50 p-10 text-center">
-          <h2 className="font-display text-2xl font-bold text-aruna-text">
-            Lihat bagaimana keempat pilar bekerja bersama, langkah demi langkah
-          </h2>
-          <Button asChild variant="gradient" size="lg">
-            <Link to="/cara-kerja">
-              Lihat Cara Kerja
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </Card>
+        <CtaBanner
+          icon={Repeat}
+          tone="dark"
+          title="Lihat bagaimana keempat pilar bekerja bersama, langkah demi langkah"
+          description="Dari ikan masuk hingga keputusan produksi tereksekusi — sepuluh langkah dalam satu siklus."
+          primary={{ label: "Lihat Cara Kerja", to: "/cara-kerja" }}
+          secondary={{ label: "Masuk ke Dashboard", to: "/app/overview" }}
+        />
       </section>
     </div>
   );

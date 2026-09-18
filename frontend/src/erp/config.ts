@@ -10,6 +10,9 @@ import {
   Wrench,
   ShieldCheck,
   Network,
+  FileBarChart2,
+  Activity,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 import type { ErpTeam } from "./types";
@@ -53,5 +56,8 @@ export const ERP_NAV: ErpNavItem[] = [
   { label: "Sales", href: "/erp/sales", icon: Handshake, team: "Sales", description: "Customer dan sales order" },
   { label: "HR & People", href: "/erp/hr", icon: Users, team: "HR", description: "Karyawan, kehadiran, dan cuti" },
   { label: "Approval Center", href: "/erp/approvals", icon: CheckSquare, description: "Semua persetujuan lintas tim" },
+  { label: "Laporan", href: "/erp/reports", icon: FileBarChart2, description: "Preview, Excel, PDF, CSV dari data live" },
+  { label: "Log Aktivitas", href: "/erp/activity", icon: Activity, description: "Jejak audit seluruh peristiwa" },
   { label: "Peta Integrasi", href: "/erp/integrations", icon: Network, description: "Alur data antar modul & FISH" },
+  { label: "Pengaturan", href: "/erp/settings", icon: Settings, description: "Profil, kurs, penomoran, notifikasi, backup" },
 ];

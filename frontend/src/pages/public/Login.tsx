@@ -190,7 +190,7 @@ export default function Login() {
 
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 text-aruna-textSecondary">
-                  <input type="checkbox" className="h-4 w-4 rounded border-aruna-border accent-aruna-primary" />
+                  <input type="checkbox" className="aruna-check" />
                   Ingat saya
                 </label>
                 <button

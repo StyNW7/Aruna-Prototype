@@ -13,10 +13,13 @@ interface ChartCardProps {
 
 export function ChartCard({ title, description, action, children, className, footnote }: ChartCardProps) {
   return (
-    <Card className={cn("flex flex-col", className)}>
+    <Card className={cn("group flex flex-col transition-shadow hover:shadow-soft", className)}>
       <CardHeader className="flex-row items-start justify-between space-y-0">
-        <div>
-          <CardTitle>{title}</CardTitle>
+        <div className="min-w-0">
+          <CardTitle className="flex items-center gap-2">
+            <span className="h-4 w-1 shrink-0 rounded-full aruna-gradient opacity-70 transition-opacity group-hover:opacity-100" />
+            {title}
+          </CardTitle>
           {description && <CardDescription className="mt-1">{description}</CardDescription>}
         </div>
         {action}

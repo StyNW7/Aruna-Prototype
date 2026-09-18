@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Wallet, ArrowDownToLine, ArrowUpFromLine, AlertCircle, BellRing, BadgeCheck, Search, Download } from "lucide-react";
+import { Wallet, ArrowDownToLine, ArrowUpFromLine, AlertCircle, BellRing, BadgeCheck, Search, FileDown } from "lucide-react";
 import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { KPICard } from "@/components/cards/KPICard";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { chartTooltipStyle, CHART_AXIS_COLOR, CHART_GRID_COLOR, CHART_COLORS, CHART_SUCCESS } from "@/components/charts/chart-theme";
 import { useErp, fmtRp, fmtRpShort, effectiveInvoiceStatus } from "../ErpContext";
 import { ErpPageHeader, SectionCard, TeamChip, fmtDate } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { ReportPreview } from "../components/ReportPreview";
+import { buildErpReport } from "../reports";
+import { exportInvoicePdf, type ExportDoc } from "../export";
+import type { ErpState } from "../types";
 import type { ErpTeam, Invoice } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +34,7 @@ function daysDiff(a: string, b: string): number {
   return Math.round((new Date(a).getTime() - new Date(b).getTime()) / 86400000);
 }
 
-function InvoiceTable({ list, onPay, kind }: { list: Invoice[]; onPay: (id: string) => void; kind: "AR" | "AP" }) {
+function InvoiceTable({ list, onPay, kind, state }: { list: Invoice[]; onPay: (id: string) => void; kind: "AR" | "AP"; state: ErpState }) {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("Semua");
   const filtered = list.filter((i) => {
@@ -54,10 +59,23 @@ function InvoiceTable({ list, onPay, kind }: { list: Invoice[]; onPay: (id: stri
             <option key={s}>{s}</option>
           ))}
         </Select>
-        <Button variant="outline" size="sm" onClick={() => toast.success(`Daftar ${kind === "AR" ? "piutang" : "hutang"} diekspor (${filtered.length} baris).`)}>
-          <Download className="h-3.5 w-3.5" />
-          Export
-        </Button>
+        <ExportMenu
+          getDoc={() => ({
+            name: kind === "AR" ? "Daftar Piutang (AR)" : "Daftar Hutang (AP)",
+            subtitle: `${filtered.length} invoice · filter: ${status}${q ? ` · "${q}"` : ""}`,
+            summary: [
+              { label: "Jumlah invoice", value: String(filtered.length) },
+              { label: "Total nilai", value: fmtRpShort(filtered.reduce((a, i) => a + i.amount, 0)) },
+              { label: "Belum lunas", value: fmtRpShort(filtered.filter((i) => i.status !== "Lunas").reduce((a, i) => a + i.amount, 0)) },
+              { label: "Terlambat", value: String(filtered.filter((i) => effectiveInvoiceStatus(i) === "Terlambat").length) },
+            ],
+            tables: [{
+              title: kind === "AR" ? "Piutang usaha" : "Hutang usaha",
+              columns: [{ key: "id", label: "Invoice" }, { key: "c", label: kind === "AR" ? "Customer" : "Supplier" }, { key: "r", label: "Referensi" }, { key: "a", label: "Nilai (Rp)", numeric: true }, { key: "i", label: "Terbit" }, { key: "d", label: "Jatuh tempo" }, { key: "s", label: "Status" }],
+              rows: filtered.map((i) => [i.id, i.counterparty, i.refId, i.amount, i.issuedDate, i.dueDate, effectiveInvoiceStatus(i)]),
+            }],
+          })}
+        />
       </div>
       {filtered.length === 0 ? (
         <div className="p-6"><EmptyState title="Tidak ada invoice" description="Ubah filter atau kata kunci pencarian." /></div>
@@ -93,9 +111,17 @@ function InvoiceTable({ list, onPay, kind }: { list: Invoice[]; onPay: (id: stri
                   <TableCell><StatusBadge status={st} /></TableCell>
                   <TableCell className="text-right">
                     {st === "Lunas" ? (
-                      <span className="text-xs text-aruna-textSecondary">Lunas {inv.paidDate ? fmtDate(inv.paidDate) : ""}</span>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <span className="text-xs text-aruna-textSecondary">Lunas {inv.paidDate ? fmtDate(inv.paidDate) : ""}</span>
+                        <Button size="sm" variant="ghost" onClick={() => { exportInvoicePdf(inv, state); toast.success(`${inv.id}.pdf diunduh.`); }} title="Unduh PDF invoice">
+                          <FileDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     ) : (
                       <div className="flex justify-end gap-1.5">
+                        <Button size="sm" variant="outline" onClick={() => { exportInvoicePdf(inv, state); toast.success(`${inv.id}.pdf diunduh.`); }} title="Unduh PDF invoice">
+                          <FileDown className="h-3.5 w-3.5" />
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => remind(inv)} title="Kirim pengingat">
                           <BellRing className="h-3.5 w-3.5" />
                         </Button>
@@ -119,6 +145,7 @@ function InvoiceTable({ list, onPay, kind }: { list: Invoice[]; onPay: (id: stri
 export default function Finance() {
   const { state, derived, dispatch } = useErp();
   const [journalTeam, setJournalTeam] = useState<"Semua" | ErpTeam>("Semua");
+  const [preview, setPreview] = useState<ExportDoc | null>(null);
 
   const ar = state.invoices.filter((i) => i.kind === "AR");
   const ap = state.invoices.filter((i) => i.kind === "AP");
@@ -155,10 +182,13 @@ export default function Finance() {
         title="Finance"
         subtitle="Piutang, hutang, jurnal otomatis, dan anggaran — setiap transaksi dari tim lain langsung tercatat di sini."
         actions={
-          <Button variant="outline" onClick={() => toast.success("Laporan keuangan bulan berjalan disiapkan (simulasi).")}>
-            <Download className="h-4 w-4" />
-            Laporan Bulanan
-          </Button>
+          <ExportMenu
+            label="Laporan Keuangan"
+            variant="default"
+            size="default"
+            getDoc={() => buildErpReport("finance-summary", state, "Bulan berjalan")}
+            onPreview={() => setPreview(buildErpReport("finance-summary", state, "Bulan berjalan"))}
+          />
         }
       />
 
@@ -217,13 +247,13 @@ export default function Finance() {
 
         <TabsContent value="ar">
           <SectionCard title="Piutang Usaha (Accounts Receivable)" description="Invoice ke customer — otomatis dibuat saat Sales menagih pengiriman">
-            <InvoiceTable list={ar} onPay={pay} kind="AR" />
+            <InvoiceTable list={ar} onPay={pay} kind="AR" state={state} />
           </SectionCard>
         </TabsContent>
 
         <TabsContent value="ap">
           <SectionCard title="Hutang Usaha (Accounts Payable)" description="Tagihan supplier — otomatis dibuat saat Warehouse menerima PO">
-            <InvoiceTable list={ap} onPay={pay} kind="AP" />
+            <InvoiceTable list={ap} onPay={pay} kind="AP" state={state} />
           </SectionCard>
         </TabsContent>
 
@@ -232,11 +262,14 @@ export default function Finance() {
             title="Jurnal Umum"
             description="Entri jurnal double-entry yang dihasilkan otomatis oleh transaksi lintas tim"
             action={
-              <Select value={journalTeam} onChange={(e) => setJournalTeam(e.target.value as "Semua" | ErpTeam)} className="h-9 w-44">
-                {["Semua", "Finance", "Warehouse", "Operations", "Sales", "Procurement"].map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </Select>
+              <div className="flex gap-2">
+                <Select value={journalTeam} onChange={(e) => setJournalTeam(e.target.value as "Semua" | ErpTeam)} className="h-9 w-44">
+                  {["Semua", "Finance", "Warehouse", "Operations", "Sales", "Procurement"].map((t) => (
+                    <option key={t}>{t}</option>
+                  ))}
+                </Select>
+                <ExportMenu getDoc={() => ({ ...buildErpReport("journal", state, "Semua"), tables: [{ ...buildErpReport("journal", state, "").tables[0], rows: journalRows.map((j) => [j.id, j.date, j.description, j.debit, j.credit, j.amount, j.ref, j.source]) }] })} />
+              </div>
             }
           >
             <Table wrapperClassName="rounded-none border-0">
@@ -272,7 +305,7 @@ export default function Finance() {
         </TabsContent>
 
         <TabsContent value="anggaran">
-          <SectionCard title="Anggaran vs Realisasi" description="Bulan berjalan per departemen">
+          <SectionCard title="Anggaran vs Realisasi" description="Bulan berjalan per departemen" action={<ExportMenu getDoc={() => buildErpReport("budget", state, "Bulan berjalan")} onPreview={() => setPreview(buildErpReport("budget", state, "Bulan berjalan"))} />}>
             <div className="divide-y divide-aruna-border">
               {state.budgets.map((b) => {
                 const pct = Math.round((b.actual / b.budget) * 100);
@@ -293,6 +326,7 @@ export default function Finance() {
           </SectionCard>
         </TabsContent>
       </Tabs>
+      <ReportPreview doc={preview} onClose={() => setPreview(null)} />
     </div>
   );
 }

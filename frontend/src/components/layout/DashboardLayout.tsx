@@ -11,7 +11,7 @@ export default function DashboardLayout() {
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <DashboardHeader />
-          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <main className="dashboard-canvas flex-1 px-4 py-6 sm:px-6 lg:px-8">
             {/* key per rute agar setiap halaman mendapat animasi masuk yang halus */}
             <div key={pathname} className="animate-fade-up">
               <Outlet />

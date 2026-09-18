@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Plus, ShoppingCart, Clock, Star, PackageCheck, Send, Check, X, Trash2, Eye, Truck } from "lucide-react";
+import { Plus, ShoppingCart, Clock, Star, PackageCheck, Send, Check, X, Trash2, Eye, Truck, FileDown } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, PieChart, Pie, Legend } from "recharts";
+import { chartTooltipStyle, CHART_AXIS_COLOR, CHART_GRID_COLOR, CHART_COLORS } from "@/components/charts/chart-theme";
 import { KPICard } from "@/components/cards/KPICard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +14,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { EmptyState } from "@/components/ui/empty-state";
 import { useErp, fmtRp, fmtRpShort } from "../ErpContext";
 import { ErpPageHeader, SectionCard, Field, fmtDate } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { buildErpReport } from "../reports";
+import { exportPurchaseOrderPdf } from "../export";
 import type { PurchaseOrder, PurchaseOrderLine } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +40,13 @@ export default function Procurement() {
 
   const list = state.purchaseOrders.filter((p) => status === "Semua" || p.status === status);
   const formTotal = lines.reduce((a, l) => a + l.qty * l.unitPrice, 0);
+
+  const analytics = useMemo(() => {
+    const spend = state.suppliers.map((sp) => ({ name: sp.name.split(" ").slice(0, 2).join(" "), value: state.purchaseOrders.filter((p) => p.supplierId === sp.id && p.status !== "Ditolak").reduce((a, p) => a + p.total, 0) })).filter((d) => d.value > 0).sort((a, b) => b.value - a.value);
+    const byStatus = ["Draft", "Menunggu Approval", "Disetujui", "Diterima", "Ditolak"].map((st) => ({ name: st, value: state.purchaseOrders.filter((p) => p.status === st).length })).filter((d) => d.value > 0);
+    const byCat = state.suppliers.map((sp) => sp.category).filter((v, i, a) => a.indexOf(v) === i).map((c) => ({ name: c, value: state.purchaseOrders.filter((p) => state.suppliers.find((sp) => sp.id === p.supplierId)?.category === c && p.status !== "Ditolak").reduce((a, p) => a + p.total, 0) })).filter((d) => d.value > 0);
+    return { spend, byStatus, byCat };
+  }, [state.purchaseOrders, state.suppliers]);
 
   const stats = useMemo(() => {
     const open = state.purchaseOrders.filter((p) => ["Draft", "Menunggu Approval", "Disetujui"].includes(p.status));
@@ -91,10 +103,13 @@ export default function Procurement() {
         title="Procurement"
         subtitle="Kelola purchase order dan supplier. PO yang disetujui Finance dapat diterima Warehouse, lalu otomatis menjadi hutang."
         actions={
-          <Button onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Buat Purchase Order
-          </Button>
+          <>
+            <ExportMenu label="Export" size="default" getDoc={() => buildErpReport("procurement", state, "Bulan berjalan")} />
+            <Button onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Buat Purchase Order
+            </Button>
+          </>
         }
       />
 
@@ -109,7 +124,56 @@ export default function Procurement() {
         <TabsList>
           <TabsTrigger value="po">Purchase Orders</TabsTrigger>
           <TabsTrigger value="supplier">Supplier</TabsTrigger>
+          <TabsTrigger value="analitik">Analitik</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="analitik">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <SectionCard title="Belanja per Supplier" description="Nilai PO (kecuali ditolak), Rp" className="xl:col-span-2">
+              <div className="h-72 px-3 py-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.spend} margin={{ left: 4, right: 12 }}>
+                    <CartesianGrid stroke={CHART_GRID_COLOR} vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} axisLine={false} tickLine={false} tickFormatter={(v) => `${Math.round(v / 1e6)}jt`} />
+                    <Tooltip {...chartTooltipStyle} formatter={(v: number) => fmtRp(v)} />
+                    <Bar dataKey="value" name="Belanja" radius={[6, 6, 0, 0]}>
+                      {analytics.spend.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </SectionCard>
+            <SectionCard title="Komposisi PO" description="Jumlah PO per status">
+              <div className="h-72 p-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={analytics.byStatus} dataKey="value" nameKey="name" innerRadius={56} outerRadius={92} paddingAngle={2}>
+                      {analytics.byStatus.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip {...chartTooltipStyle} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </SectionCard>
+            <SectionCard title="Belanja per Kategori Supplier" description="Bahan baku, kemasan, consumable, jasa, utilitas" className="xl:col-span-3">
+              <div className="divide-y divide-aruna-border">
+                {analytics.byCat.map((c, i) => {
+                  const total = analytics.byCat.reduce((a, x) => a + x.value, 0) || 1;
+                  const pct = Math.round((c.value / total) * 100);
+                  return (
+                    <div key={c.name} className="grid grid-cols-[160px_1fr_140px] items-center gap-3 px-5 py-3 text-sm">
+                      <span className="font-medium text-aruna-text">{c.name}</span>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-aruna-light1"><div className="h-full rounded-full" style={{ width: `${pct}%`, background: CHART_COLORS[i % CHART_COLORS.length] }} /></div>
+                      <span className="text-right text-xs text-aruna-textSecondary"><strong className="text-aruna-text">{fmtRpShort(c.value)}</strong> · {pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionCard>
+          </div>
+        </TabsContent>
 
         <TabsContent value="po">
           <SectionCard
@@ -334,6 +398,7 @@ export default function Procurement() {
                 })}
               </div>
               <DialogFooter>
+                <Button variant="outline" onClick={() => { exportPurchaseOrderPdf(detail, state); toast.success(`${detail.id}.pdf diunduh.`); }}><FileDown className="h-4 w-4" /> PDF PO</Button>
                 {detail.status === "Draft" && <Button onClick={() => act(detail, "submit")}><Send className="h-4 w-4" /> Ajukan</Button>}
                 {detail.status === "Menunggu Approval" && (
                   <>

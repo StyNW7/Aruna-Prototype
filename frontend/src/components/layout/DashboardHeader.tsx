@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, MapPin, CalendarDays } from "lucide-react";
+import { Menu, CalendarDays } from "lucide-react";
 import { navGroups } from "./nav-config";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationDrawer } from "./NotificationDrawer";
@@ -64,10 +64,6 @@ export function DashboardHeader() {
 
       <div className="flex items-center gap-2 sm:gap-3">
         <div className="hidden items-center gap-2 whitespace-nowrap xl:flex">
-          <div className="hidden items-center gap-1.5 rounded-lg bg-aruna-light1 px-2.5 py-1.5 text-xs font-medium text-aruna-dark 2xl:flex">
-            <MapPin className="h-3.5 w-3.5" />
-            Hub Pelabuhan Bungus
-          </div>
           <div
             className="flex items-center gap-1.5 rounded-lg border border-aruna-border bg-white px-2.5 py-1.5 text-xs font-medium text-aruna-text"
             title="Waktu lokal & shift aktif"

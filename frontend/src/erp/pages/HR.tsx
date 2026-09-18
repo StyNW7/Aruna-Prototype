@@ -14,6 +14,8 @@ import { chartTooltipStyle, CHART_AXIS_COLOR, CHART_GRID_COLOR } from "@/compone
 import { useErp } from "../ErpContext";
 import { TEAM_META } from "../config";
 import { ErpPageHeader, SectionCard, Field, TeamChip, fmtDate } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { buildErpReport } from "../reports";
 import type { Employee, ErpTeam, LeaveRequest } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -55,9 +57,12 @@ export default function HR() {
         title="HR & People"
         subtitle="Direktori karyawan lintas tim, kehadiran hari ini, roster shift, dan pengajuan cuti yang terhubung ke Approval Center."
         actions={
-          <Button onClick={() => setOpenLeave(true)}>
-            <Plus className="h-4 w-4" /> Ajukan Cuti
-          </Button>
+          <>
+            <ExportMenu label="Export" size="default" getDoc={() => buildErpReport("hr", state, "Hari ini")} />
+            <Button onClick={() => setOpenLeave(true)}>
+              <Plus className="h-4 w-4" /> Ajukan Cuti
+            </Button>
+          </>
         }
       />
 

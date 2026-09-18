@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { chartTooltipStyle, CHART_COLORS } from "@/components/charts/chart-theme";
 import { useErp, fmtRpShort } from "../ErpContext";
 import { ErpPageHeader, SectionCard, Field } from "../components/shared";
+import { ExportMenu } from "../components/ExportMenu";
+import { buildErpReport } from "../reports";
 import type { InventoryItem, StockMovementType } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -66,12 +68,15 @@ export default function Inventory() {
         title="Warehouse & Inventory"
         subtitle="Stok bahan baku, kemasan, dan finished goods. Bertambah saat PO diterima atau WO selesai; berkurang saat produksi dan pengiriman."
         actions={
-          <Button asChild variant="outline">
-            <Link to="/erp/procurement">
-              <ShoppingCart className="h-4 w-4" />
-              Ajukan Restock
-            </Link>
-          </Button>
+          <>
+            <ExportMenu label="Export Stok" size="default" getDoc={() => buildErpReport("inventory", state, "Saat ini")} />
+            <Button asChild variant="outline">
+              <Link to="/erp/procurement">
+                <ShoppingCart className="h-4 w-4" />
+                Ajukan Restock
+              </Link>
+            </Button>
+          </>
         }
       />
 
@@ -166,7 +171,7 @@ export default function Inventory() {
         </TabsContent>
 
         <TabsContent value="mutasi">
-          <SectionCard title="Riwayat Mutasi Stok" description="Setiap pergerakan tercatat dengan referensi PO / WO / SO / penyesuaian">
+          <SectionCard title="Riwayat Mutasi Stok" description="Setiap pergerakan tercatat dengan referensi PO / WO / SO / penyesuaian" action={<ExportMenu getDoc={() => buildErpReport("movements", state, "Semua")} />}>
             <Table wrapperClassName="rounded-none border-0">
               <TableHeader>
                 <TableRow>

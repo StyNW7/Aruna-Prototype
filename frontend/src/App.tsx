@@ -50,6 +50,9 @@ import ErpSales from "@/erp/pages/Sales";
 import ErpHR from "@/erp/pages/HR";
 import ErpApprovals from "@/erp/pages/Approvals";
 import ErpIntegrations from "@/erp/pages/Integrations";
+import ErpReports from "@/erp/pages/Reports";
+import ErpActivity from "@/erp/pages/ActivityLog";
+import ErpSettings from "@/erp/pages/Settings";
 
 function App() {
   return (
@@ -102,12 +105,32 @@ function App() {
           <Route path="hr" element={<ErpHR />} />
           <Route path="approvals" element={<ErpApprovals />} />
           <Route path="integrations" element={<ErpIntegrations />} />
+          <Route path="reports" element={<ErpReports />} />
+          <Route path="activity" element={<ErpActivity />} />
+          <Route path="settings" element={<ErpSettings />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
-      <Toaster position="top-center" />
+      <Toaster
+        position="top-center"
+        gutter={8}
+        toastOptions={{
+          duration: 3200,
+          style: {
+            borderRadius: 12,
+            border: "1px solid #E3EAF0",
+            boxShadow: "0 1px 2px rgba(1,96,151,0.05), 0 18px 36px -18px rgba(1,96,151,0.28)",
+            color: "#1E293B",
+            fontSize: 13,
+            fontFamily: "Inter, system-ui, sans-serif",
+            padding: "10px 14px",
+          },
+          success: { iconTheme: { primary: "#1E8E5A", secondary: "#fff" } },
+          error: { iconTheme: { primary: "#D8342A", secondary: "#fff" } },
+        }}
+      />
     </BrowserRouter>
   );
 }

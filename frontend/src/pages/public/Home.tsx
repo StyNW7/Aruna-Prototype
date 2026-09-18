@@ -270,6 +270,12 @@ export default function Home() {
           </Reveal>
         </div>
 
+        {/* Wave divider */}
+        <svg className="pointer-events-none relative -mb-px block h-10 w-full text-white/70 sm:h-14" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path fill="currentColor" d="M0,48 C240,88 480,8 720,40 C960,72 1200,24 1440,48 L1440,80 L0,80 Z" />
+          <path fill="currentColor" opacity="0.5" d="M0,60 C260,24 520,84 780,52 C1040,20 1240,64 1440,36 L1440,80 L0,80 Z" />
+        </svg>
+
         {/* Module ticker */}
         <div className="marquee relative border-t border-aruna-border/70 bg-white/70 py-3 backdrop-blur">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white to-transparent" />

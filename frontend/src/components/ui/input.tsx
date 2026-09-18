@@ -6,7 +6,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-lg border border-aruna-border bg-white px-3 py-2 text-sm text-aruna-text placeholder:text-aruna-textSecondary/60 focus:outline-none focus:ring-2 focus:ring-secondary/40 disabled:opacity-50",
+        "flex h-10 w-full rounded-lg border border-aruna-border bg-white px-3 py-2 text-sm text-aruna-text shadow-[inset_0_1px_2px_rgba(15,23,42,0.03)] transition-colors placeholder:text-aruna-textSecondary/60 hover:border-aruna-medium/70 focus:border-aruna-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30 disabled:opacity-50",
         className
       )}
       {...props}
@@ -20,7 +20,7 @@ export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttrib
     <select
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-lg border border-aruna-border bg-white px-3 py-2 text-sm text-aruna-text focus:outline-none focus:ring-2 focus:ring-secondary/40",
+        "aruna-select flex h-10 w-full rounded-lg border border-aruna-border bg-white px-3 py-2 text-sm text-aruna-text transition-colors hover:border-aruna-medium/70 focus:border-aruna-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30",
         className
       )}
       {...props}
@@ -39,16 +39,21 @@ export const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttribute
 Label.displayName = "Label";
 
 export const Slider = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input
-      ref={ref}
-      type="range"
-      className={cn(
-        "h-2 w-full cursor-pointer appearance-none rounded-full bg-aruna-light1 accent-aruna-primary",
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, style, ...props }, ref) => {
+    // Persentase isi track untuk gradien (dihitung dari value/min/max)
+    const min = Number(props.min ?? 0);
+    const max = Number(props.max ?? 100);
+    const val = Number(props.value ?? props.defaultValue ?? min);
+    const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+    return (
+      <input
+        ref={ref}
+        type="range"
+        className={cn("aruna-range w-full cursor-pointer", className)}
+        style={{ ...style, ["--range-pct" as string]: `${Math.max(0, Math.min(100, pct))}%` }}
+        {...props}
+      />
+    );
+  }
 );
 Slider.displayName = "Slider";

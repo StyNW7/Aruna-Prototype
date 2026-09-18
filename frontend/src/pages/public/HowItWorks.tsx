@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import {
   Fish,
   Ruler,
@@ -10,11 +9,10 @@ import {
   Factory,
   Gauge,
   RefreshCcw,
-  ArrowRight,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/public/PageHero";
+import { CtaBanner } from "@/components/public/CtaBanner";
 
 const steps = [
   {
@@ -162,17 +160,13 @@ export default function HowItWorks() {
       </section>
 
       <section className="container">
-        <Card className="flex flex-col items-center gap-4 border-aruna-border bg-aruna-light1/50 p-10 text-center">
-          <h2 className="font-display text-2xl font-bold text-aruna-text">
-            Siap melihat langkah-langkah ini bekerja di dashboard nyata?
-          </h2>
-          <Button asChild variant="gradient" size="lg">
-            <Link to="/app/overview">
-              Masuk ke Dashboard
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </Card>
+        <CtaBanner
+          icon={Gauge}
+          title="Siap melihat langkah-langkah ini bekerja di dashboard nyata?"
+          description="Semua modul aktif dengan data ilustratif — coba jalankan optimizer dan simulasi skenario."
+          primary={{ label: "Masuk ke Dashboard", to: "/app/overview" }}
+          secondary={{ label: "Buka Aruna ERP", to: "/erp" }}
+        />
       </section>
     </div>
   );
